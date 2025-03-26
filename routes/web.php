@@ -11,6 +11,13 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\AccountsController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return view('auth.login');
+});
+
+Route::get('/register', function() {
+    return view('auth.register')->name('register');
+});
 
 Route::middleware(['auth', 'roles:admin'])->group(function() {
     Route::controller(AdminController::class)->group(function(){
@@ -45,9 +52,6 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
     Route::controller(AccountsController::class)->group(function(){
         Route::get('/admin/accounts', 'AllACcounts')->name('accts');
     });
-});
-Route::get('/', function () {
-    return view('welcome');
 });
 
 Route::get('/dashboard', function () {
