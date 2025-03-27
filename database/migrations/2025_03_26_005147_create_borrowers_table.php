@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('borrowers', function (Blueprint $table) {
             $table->id();
+            $table->string('firstname');
+            $table->string('middlename');
+            $table->string('lastname');
+            $table->date('date_birth');
+            $table->string('contact_no');
+            $table->text('address');
+            $table->string('emp_id');
+            $table->float('shared_capital');
+            $table->tinyInteger('dept_id');
+            // $table->foreign('dept_id')->reference('departments');
+            $table->tinyInteger('years_service');
             $table->timestamps();
         });
     }

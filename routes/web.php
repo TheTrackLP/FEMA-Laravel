@@ -9,15 +9,18 @@ use App\Http\Controllers\LoanPlansController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\RegisteredBorrowerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('auth.login');
+})->name('login');
+
+Route::controller(RegisteredBorrowerController::class)->group(function(){
+    Route::get('/register', 'RegisterPage')->name('register');
+    Route::post('/register/borrower/store', 'RegisterBorrower')->name('store.borrower');
 });
 
-Route::get('/register', function() {
-    return view('auth.register')->name('register');
-});
 
 Route::middleware(['auth', 'roles:admin'])->group(function() {
     Route::controller(AdminController::class)->group(function(){
