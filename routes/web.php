@@ -28,7 +28,10 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
     });
 
     Route::controller(BorrowersController::class)->group(function(){
-        Route::get('/admin/borrowers', 'BorrowerDashboard')->name('borrow.dash');
+        Route::get('/admin/borrowers', 'BorrowerDashboard')->name('borrow.list');
+        Route::get('/admin/borrower/show/{id}', 'BorrowerDetails');
+        Route::post('/admin/borrower/update', 'BorrowerUpdate')->name('borrow.update');
+        Route::get('/admin/borrower/delete/{id}', 'BorrowerDelete')->name('borrow.delete');
     });
 
     Route::controller(LoansController::class)->group(function(){

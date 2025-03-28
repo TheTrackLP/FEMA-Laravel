@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('borrowers', function (Blueprint $table) {
             $table->id();
+            $table->integer('borrower_ref')->unique();
             $table->string('firstname');
             $table->string('middlename');
             $table->string('lastname');
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->tinyInteger('dept_id');
             // $table->foreign('dept_id')->reference('departments');
             $table->tinyInteger('years_service');
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }

@@ -19,6 +19,8 @@ class RegisteredBorrowerController extends Controller
 
     public function RegisterBorrower(Request $request)
     {
+        $borrow_ref = rand(0, 9999999);
+
         $valid = Validator::make($request->all(), [
             'firstname'  => 'required',
             'middlename'  => 'required',
@@ -67,6 +69,7 @@ class RegisteredBorrowerController extends Controller
         }
 
         $borrower_id = Borrower::insertGetId([
+            'borrower_ref' => $borrow_ref,
             'firstname'  => $request->firstname,
             'middlename'  => $request->middlename,
             'lastname' => $request->lastname,
@@ -77,6 +80,7 @@ class RegisteredBorrowerController extends Controller
             'shared_capital' => $request->shared_capital,
             'dept_id' => $request->dept_id,
             'years_service' => $request->years_service,
+            'status' => 0,
             'created_at' => Carbon::now(),
         ]);
 

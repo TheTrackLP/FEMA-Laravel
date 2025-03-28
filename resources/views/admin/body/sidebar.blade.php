@@ -43,7 +43,7 @@
                         Home
                     </a>
                     <hr>
-                    <a class="nav-link button-hover" href="{{ route('borrow.dash') }}">
+                    <a class="nav-link button-hover" href="{{ route('borrow.list') }}">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-list"></i></div>
                         Borrowers
                     </a>
