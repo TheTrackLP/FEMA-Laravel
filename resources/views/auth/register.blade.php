@@ -1,3 +1,6 @@
+@php
+    $depts = App\Models\Departments::all();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +14,9 @@
     
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         body{
             background-image: linear-gradient(to bottom right, #00AFB9, #FED9B7);
@@ -103,14 +109,24 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="labels mb-2">Department:</label>
-                                <input type="text" class="form-control" name="dept_id" placeholder="Department">
+                                <select name="dept_id" class="select2">
+                                    <option value=""></option>
+                                    @foreach ($depts as $dept)
+                                    <option value="{{ $dept->id }}">{{ $dept->dept_name }}</option>
+                                    @endforeach
+                                </select>
                                 @error('dept_id')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="labels mb-2">Years in Service:</label>
-                                <input type="text" class="form-control" name="years_service" placeholder="additional details">
+                                <select name="years_service" class="select2">
+                                    <option value=""></option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
                                 @error('years_service')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
@@ -159,6 +175,12 @@
 </body>
 </html>
 <script>
+    $(document).ready(function(){
+        $(".select2").select2({
+            width: "100%",
+            placeholder: "Select an option",
+        });
+    });
     @if(Session::has('message'))
     var type = "{{ Session::get('alert-type','info') }}"
     switch(type){

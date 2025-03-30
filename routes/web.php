@@ -52,7 +52,11 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
     });
 
     Route::controller(DepartmentController::class)->group(function(){
-        Route::get('/admin/departments', 'DepartmentsLists')->name('dept');
+        Route::get('/admin/departments', 'DepartmentsLists')->name('dept.list');
+        Route::post('/admin/departments/store', 'DepartmentStore')->name('dept.add');
+        Route::get('/admin/departments/edit/{id}', 'DepartmentEdit');
+        Route::post('/admin/departments/update', 'DepartmentUpdate')->name('dept.update');
+        Route::get('/admin/departments/delete/{id}', 'DepartmentDelete')->name('dept.delete');
     });
 
     Route::controller(AccountsController::class)->group(function(){

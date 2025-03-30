@@ -7,17 +7,22 @@
             <h4>New/Current Borrower Lists</h4>
         </div>
         <div class="card-body">
-            <div class="row mb-5">
+            <div class="row mb-3">
                 <div class="col-lg-4">
                     <label for="">Office/Departmnet</label>
-                    <select name="" id="" class="form-select">
+                    <select name="" id="" class="form-select select2">
                         <option value=""></option>
+                        @foreach ($depts as $dept)
+                        <option value="{{ $dept->id }}">{{ $dept->dept_name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-lg-4">
                     <label for="">Status</label>
-                    <select name="" id="" class="form-select">
+                    <select name="" id="" class="form-select select2">
                         <option value=""></option>
+                        <option value="0">New Member</option>
+                        <option value="1">Exist Member</option>
                     </select>
                 </div>
             </div>
@@ -45,12 +50,12 @@
                         <td class="text-center">{{ $data->borrower_ref }}</td>
                         <td>{{ $data->borrower }}</td>
                         <td class="text-center">{{ number_format($data->shared_capital, 2) }}</td>
-                        <td class="text-center">{{ $data->dept_id }}</td>
+                        <td class="text-center">{{ $data->dept }}</td>
                         <td class="text-center">
                             @if($data->status == 0)
-                            <span class="badge rounded-pill text-bg-danger">Danger</span>
+                            <span class="badge rounded-pill text-bg-secondary">New</span>
                             @elseif($data->status  == 1)
-                            <span class="badge rounded-pill text-bg-primary">Primary</span>
+                            <span class="badge rounded-pill text-bg-primary">Exist</span>
                             @else
                             @endif
                         </td>

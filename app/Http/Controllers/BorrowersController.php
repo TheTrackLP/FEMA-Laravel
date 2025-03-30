@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\Borrower;
+use App\Models\Departments;
 use Hash;
 use Validator;
 use Carbon\Carbon;
@@ -16,9 +17,13 @@ class BorrowersController extends Controller
         $borrowers = DB::table('borrowers')
                             ->select(
                                 'borrowers.*',
-                                DB::raw("CONCAT(borrowers.lastname, ', ', borrowers.firstname, ' ', borrowers.lastname) as borrower")
-                            )->get();
-        return view('admin.backend.borrower.borrowers', compact('borrowers'));
+                                DB::raw("CONCAT(borrowers.lastname, ', ', borrowers.firstname, ' ', borrowers.lastname) as borrower"),
+                                DB::raw("CONCAT(departments.dept_name) as dept"),
+                            )
+                            ->join('departments', 'departments.id', '=', 'borrowers.dept_id')
+                            ->get();
+        $depts = Departments::all();
+        return view('admin.backend.borrower.borrowers', compact('borrowers', 'depts'));
     }
 
     public function BorrowerDetails($id)

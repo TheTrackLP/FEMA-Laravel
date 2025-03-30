@@ -73,7 +73,7 @@
                         Staffs/Borrowers
                     </a>
                     <hr>
-                    <a class="nav-link button-hover" href="{{route('dept')}}">
+                    <a class="nav-link button-hover" href="{{route('dept.list')}}">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-building"></i></div>
                         Departments
                     </a>

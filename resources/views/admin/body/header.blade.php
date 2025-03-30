@@ -19,6 +19,9 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <script src="{{ asset('backend/assets/js/code.js') }}"></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     </head>
     <style>
         label{
@@ -104,6 +107,10 @@ $(function(){
     @endif
 
     $(document).ready(function(){
+        $('.select2').select2({
+            width: "100%",
+            placeholder: "Select an option",
+        });
         $('#borrowerTable').DataTable();
         $('#reportTable').DataTable();
         });
