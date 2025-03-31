@@ -4,13 +4,9 @@
 <div class="container-fluid">
     <div class="row mt-3">
         <div class="col-md-4">
-            @if ($depts[0]->id)
-            <form action="{{route('dept.update')}}" method="post">
+            <form action="{{route('dept.add')}}" id="deptForm" method="post">
+                @csrf
                 <input type="hidden" name="id" id="id">
-            @else
-            <form action="{{route('dept.add')}}" method="post">
-            @endif
-                    @csrf
                 <div class="card">
                     <div class="card-header">
                         Department
@@ -70,6 +66,7 @@
                 success:function(res){
                     $("#dept_name").val(res.dept.dept_name);
                     $("#id").val(dept_id);
+                    $("#deptForm").attr("action", "{{ route('dept.update') }}");
                 }
             })
         });

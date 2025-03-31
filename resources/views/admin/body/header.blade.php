@@ -27,6 +27,9 @@
         label{
             font-weight: bold;
         }
+        .uppercase{
+            text-transform: uppercase; 
+        }
     </style>
     <body class="sb-nav-fixed">
         @include('admin.body.navbar')

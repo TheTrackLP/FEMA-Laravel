@@ -45,6 +45,9 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
 
     Route::controller(LoanPlansController::class)->group(function(){
        Route::get('/admin/loan_plans', 'LoanPlanLists')->name('plan.list'); 
+       Route::post('/admin/loan_plans/add', 'AddLoanPlan')->name('plan.add');
+       Route::get('/admin/loan_plans/edit/{id}', 'LoanPlanEdit');
+       Route::post('/admin/loan_plans/update', 'LoanPlanUpdate')->name('plan.update');
     });
 
     Route::controller(ReportController::class)->group(function(){
