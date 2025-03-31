@@ -86,4 +86,14 @@ class LoanPlansController extends Controller
                             'alert-type' => 'success',
                          ]);
     }
+
+    public function LoanPlanDelete($id)
+    {
+        LoanPlans::findorfail($id)->delete();
+        return redirect()->route('plan.list')
+                         ->with([
+                            'message' => 'Loan Plan Delete Successfully',
+                            'alert-type' => 'warning',
+                         ]);
+    }
 }

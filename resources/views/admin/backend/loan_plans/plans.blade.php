@@ -42,7 +42,7 @@
                     <button type="button" value="{{$plan->id}}" class="btn btn-warning px-4 col-xs-3" id="editPlan"
                         value=""><i class="fa-solid fa-pen-to-square"></i>
                     </button>
-                    <a href="" class="btn btn-danger px-4 col-xs-3"
+                    <a href="{{ route('plan.delete', $plan->id) }}" class="btn btn-danger px-4 col-xs-3"
                         id="delete"><i class="fa-solid fa-trash-can"></i>
                     </a>
                 </div>
@@ -110,7 +110,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/admin/loan_plans/edit/" + plan_id,
+                url: "/admin/loan-plans/edit/" + plan_id,
                 success: function(res){
                     $("#plan_name").val(res.plan.plan_name);
                     $("#interest_percentage").val(res.plan.interest_percentage);
