@@ -35,7 +35,11 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
     });
 
     Route::controller(LoansController::class)->group(function(){
-        Route::get('/admin/loans', 'LoansLists')->name('loans.dash');
+        Route::get('/admin/loan-lists', 'LoansLists')->name('loans.dash');
+        Route::get('/admin/loan-lists/getData/{id}', 'GetBorrower');
+        Route::post('/admin/loan-lists/applicant/store', 'AddApplication')->name('loans.store');
+        Route::get('/admin/loan-lists/applicant/edit/{id}', 'loanListsEdit');
+        Route::post('/admin/loan-lists/applicant/update', 'loanListsUpdate')->name('loans.update');
     });
 
     

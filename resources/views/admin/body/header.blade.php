@@ -30,6 +30,9 @@
         .uppercase{
             text-transform: uppercase; 
         }
+        td,p{
+            margin: 0;
+        }
     </style>
     <body class="sb-nav-fixed">
         @include('admin.body.navbar')
@@ -114,6 +117,12 @@ $(function(){
             width: "100%",
             placeholder: "Select an option",
         });
+        
+        $('.appliSelect2').select2({
+            width: "100%",
+            placeholder: "Select an option",
+            dropdownParent: $("#addApplication"),
+        })
         $('#borrowerTable').DataTable();
         $('#reportTable').DataTable();
         });
