@@ -33,9 +33,8 @@
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">CV#</th>
-                        <th class="text-center">Borrower's Name</th>
-                        <th class="text-center">Shared Capital</th>
-                        <th class="text-center">Plan</th>
+                        <th class="text-center">Borrower's Details</th>
+                        <th class="text-center">Amount Details</th>
                         <th class="text-center">Next Payment Details</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Action</th>
@@ -47,21 +46,44 @@
                     @endphp
                     @foreach ($loans as $loan)
                     @php
-                        // $offset = DB::table('payments')->where('loan_id', $loan->id)->count();
-                        // $next = LoanSchedules::select('date_due')->where('loan_id', $loan->id)
-                        //                         ->limit(1)->offset($offset)->get();
+                        $offset = App\Models\Payments::where('loan_id', $loan->id)->count();
+                        $next = App\Models\LoanSchedules::select('date_due')->where('loan_id', $loan->id)
+                                                ->limit(1)->offset($offset)->get();
+                        $interest = ($loan->amount * $loan->interest_percentage/100);
+                        $penalty = ($loan->amount * $loan->penalty_rate/100);
+                        $curr_date = Carbon\Carbon::now();
                     @endphp 
                     <tr>
                         <td class="text-center">{{$i++}}</td>
                         <td class="text-center">{{$loan->borrower_ref}}</td>
-                        <td>{{ $loan->borrow }}</td>
-                        <td class="text-center">{{ number_format($loan->shared_capital, 2) }}</td>
-                        <td>{{$loan->plan}}</td>
                         <td>
-                            <p>Date:</p>
-                            <p>Principal:</p>
-                            <p>Intenrest:</p>
-                            <p>Penalty:</p>
+                            <p>Name: <b>{{ $loan->borrow }}</b></p>
+                            <p class="uppercase">Plan: <b>{{ $loan->plan }}</b></p>
+                        </td>
+                        <td>
+                            <p>Capital: <b>{{ number_format($loan->shared_capital, 2) }}</b></p>
+                            <p>Balance: <b>{{ number_format($loan->amount, 2) }}</b></p>
+                        </td>
+                        <td>
+                            @if ($loan->status == 2)
+                            @foreach ($next as $nextDate)
+                           <small><p><b>{{ date('M d, Y', strtotime($nextDate->date_due)) }}</b></p></small>
+                            @endforeach
+                            @php
+                                $withInterest = Carbon\Carbon::parse($nextDate->date_due)->format('d')
+                            @endphp
+                            @if ($withInterest >= 1 && $withInterest <= 15)
+                            <p class="text-primary">Principal: <b>500.00</b></p>
+                            @elseif ($withInterest >= 6 && $withInterest <= 31)
+                            <p class="text-primary">Principal: <b>500.00</b></p>
+                            <p class="text-danger">Interest: <b>{{ number_format($interest, 2) }}</b></p>
+                            @endif
+                            @if($curr_date >= $nextDate->date_due)
+                            <p class="text-danger">Penalty: <b>{{ $penalty }}</b></p>
+                            @endif
+                            @else
+                            <p class="text-center">N/A</p>
+                            @endif
                         </td>
                         <td class="text-center">
                             @if ($loan->status == 0)
@@ -122,7 +144,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row mb-5">
                         <div class="col-md-6">
                             <label for="">Loan Plan:</label>
                             <select name="plan_id" id="plan_id" class="appliSelect2">
@@ -143,33 +165,27 @@
                         </div>
                     </div>
                     <div class="row mb-3 justify-content-center status_radio">
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 approved">
                             <div class="form-check radio">
                                 <input class="form-check-input" type="radio" value="1" name="status" id="Approved">
-                                <label class="form-check-label text-success" for="Approved">
-                                  Approved
-                                </label>
+                                <label class="form-check-label text-success" for="Approved">Approved</label>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 active">
                             <div class="form-check radio">
                                 <input class="form-check-input" type="radio" value="2" name="status" id="Active">
-                                <label class="form-check-label text-primary" for="Active">
-                                  Active
-                                </label>
+                                <label class="form-check-label text-primary" for="Active">Active</label>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 denied">
                             <div class="form-check radio">
                                 <input class="form-check-input" type="radio" value="3" name="status" id="denied">
-                                <label class="form-check-label text-danger" for="denied">
-                                  Denied
-                                </label>
+                                <label class="form-check-label text-danger" for="denied">Denied</label>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer botton_save">
                     <button type="submit" class="btn btn-success btn-lg px-5">Save</button>
                 </div>
             </div>
@@ -177,6 +193,7 @@
     </div>
 </div>
 <script>
+
     $(document).on('click', '#clear', function(){
         $("#applicantForm")[0].reset();
         $("#id").val("");
@@ -184,6 +201,7 @@
         $("#plan_id").val("").trigger("change");
         $("#years_serv").val("").trigger("change");
         $(".status_radio").css("display", "none");
+        $(':input[type="submit"]').prop('disabled', false);
         $("#applicantForm").attr("action", "{{ route('loans.store') }}"); 
     })
 $(document).ready(function(){
@@ -215,12 +233,26 @@ $(document).ready(function(){
                 $("#purpose").val(res.appli.purpose);
                 $("#id").val(loan_id);
                 $("#applicantForm").attr("action", "{{ route('loans.update') }}"); 
+                
+                var status = res.appli.status;
+                if (status === 0) {
+                    $(".active").css("display", "none");
+                }else if(status === 2){
+                    $(".status_radio").css("display", "none");
+                    $(':input[type="submit"]').prop('disabled', true);
+                } else {
+                    $(".status_radio").css({
+                        "display" : "flex",
+                        "justify-content" : "center",
+                    });
+                    $(':input[type="submit"]').prop('disabled', false);
+                    $(".active").css({
+                        "display" : "flex",
+                        "justify-content" : "center",
+                    });
+                }
             }
         })
-        $(".status_radio").css({
-            "display" : "flex",
-            "justify-content" : "center",
-        });
     })
 });
 </script>

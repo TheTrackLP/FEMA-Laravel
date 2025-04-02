@@ -34,8 +34,8 @@
                 <tr>
                     <td class="text-center">1</td>
                     <td>
-                        <p>Loan Ref. #: <b>{{ $payee->loan_refno }}</b></p>
-                        <p>OR. #: <b>{{ $payee->off_rec }}</b></p>
+                        <small><p>Loan Ref. #: <b>{{ $payee->loan_refno }}</b></p></small>
+                        <small><p>OR. #: <b>{{ $payee->off_rec }}</b></p></small>
                     </td>
                     <td>
                         <p>Name: <b>{{ $payee->borrow }}</b></p>

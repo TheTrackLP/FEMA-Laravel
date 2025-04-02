@@ -19,6 +19,8 @@ class LoansController extends Controller
                         ->select(
                             'loan_lists.*',
                             'borrowers.borrower_ref',
+                            'loan_plans.interest_percentage',
+                            'loan_plans.penalty_rate',
                             DB::raw("CONCAT(borrowers.lastname, ', ', borrowers.firstname, ' ', borrowers.lastname) as borrow"),
                             DB::raw("CONCAT(loan_plans.plan_name) as plan"),
                         )

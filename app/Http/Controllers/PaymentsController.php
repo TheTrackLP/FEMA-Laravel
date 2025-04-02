@@ -63,7 +63,6 @@ class PaymentsController extends Controller
                                 'alert-type' => 'error',
                              ]);
         }
-
         Payments::create([
             'off_rec'  => $request->off_rec,
             'loan_id'  => $request->loan_id,
@@ -74,6 +73,22 @@ class PaymentsController extends Controller
             'capital'  => $request->capital,
             'penalty'  => $request->penalty,
         ]);
+
+        $curr_balance = LoanLists::select("amount")->where('id', $request->loan_id)->sum('amount');
+        $curr_capital = Borrower::select("shared_capital")->where('id', $request->borrower_id)->sum('shared_capital');
+
+        $minus_balance = $curr_balance - $request->input('paid');
+        $plus_capital = $curr_capital + $request->input('capital');
+
+        LoanLists::where('id', $request->loan_id)
+                    ->update([
+                        'amount' => $minus_balance
+                    ]);
+
+        Borrower::where('id', $request->borrower_id)
+                    ->update([
+                        'shared_capital' => $plus_capital
+                    ]);
 
         return redirect()->route('pay.list')
                     ->with([
