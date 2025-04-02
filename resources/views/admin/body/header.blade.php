@@ -123,6 +123,11 @@ $(function(){
             placeholder: "Select an option",
             dropdownParent: $("#addApplication"),
         })
+        $('.paymentSelect2').select2({
+            width: "100%",
+            placeholder: "Select an option",
+            dropdownParent: $("#modalPayment"),
+        })
         $('#borrowerTable').DataTable();
         $('#reportTable').DataTable();
         });

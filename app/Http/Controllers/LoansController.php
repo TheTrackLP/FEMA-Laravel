@@ -30,6 +30,7 @@ class LoansController extends Controller
                                 'borrowers.*',
                                 DB::raw("CONCAT(borrowers.lastname, ', ', borrowers.firstname, ' ', borrowers.lastname) as borrower"),
                             )
+                            ->where('borrowers.status', 1)
                             ->get();
         $plans = LoanPlans::all();
         return view('admin.backend.loan.loans', compact('borrowers', 'plans', 'loans'));

@@ -45,6 +45,8 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
     
     Route::controller(PaymentsController::class)->group(function(){
         Route::get('/admin/payments', 'PaymentLists')->name('pay.list');
+        Route::get('/admin/payments/getLoan/{id}', 'GetLoanData');
+        Route::post('/admin/payments/add', 'AddPayment')->name('pay.add');
     });
 
     Route::controller(LoanPlansController::class)->group(function(){
