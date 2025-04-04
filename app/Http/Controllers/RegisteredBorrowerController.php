@@ -90,6 +90,7 @@ class RegisteredBorrowerController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'roles' => 'borrower',
+            'status' => 1,
         ]);
 
         return redirect()->route('login')->with([

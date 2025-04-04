@@ -71,6 +71,8 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
 
     Route::controller(AccountsController::class)->group(function(){
         Route::get('/admin/accounts', 'AllACcounts')->name('accts');
+        Route::get('/admin/accounts/info/{id}', 'GetAccountInfo');
+        Route::post('/admin/accounts/update', 'AccountUpdate')->name('accts.update');
     });
 });
 

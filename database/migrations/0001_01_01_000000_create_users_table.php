@@ -19,6 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('roles', ['admin', 'borrower'])->default('borrower');
+            $table->tinyInteger('status')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
