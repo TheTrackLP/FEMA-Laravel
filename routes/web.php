@@ -25,10 +25,11 @@ Route::controller(RegisteredBorrowerController::class)->group(function(){
 Route::middleware(['auth', 'roles:admin'])->group(function() {
     Route::controller(AdminController::class)->group(function(){
         Route::get('/admin/dashboard', 'AdminDashboard')->name('admin.dash');
+        Route::get("/admin/dashboard/logout", "AdminLogout")->name('admin.logout');
     });
 
     Route::controller(BorrowersController::class)->group(function(){
-        Route::get('/admin/borrowers', 'BorrowerDashboard')->name('borrow.list');
+        Route::get('/admin/borrowers', 'BorrowerLists')->name('borrow.list');
         Route::get('/admin/borrower/show/{id}', 'BorrowerDetails');
         Route::post('/admin/borrower/update', 'BorrowerUpdate')->name('borrow.update');
         Route::get('/admin/borrower/delete/{id}', 'BorrowerDelete')->name('borrow.delete');
@@ -73,6 +74,14 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
         Route::get('/admin/accounts', 'AllACcounts')->name('accts');
         Route::get('/admin/accounts/info/{id}', 'GetAccountInfo');
         Route::post('/admin/accounts/update', 'AccountUpdate')->name('accts.update');
+    });
+});
+
+Route::middleware(['auth', 'roles:borrower'])->group(function(){
+    Route::controller(BorrowersController::class)->group(function(){
+        Route::get("/borrower/dashboard", "BorrowerDashboard")->name('borrow.dash');
+        Route::post("/borrower/dashboard/apply/loan", "BorrowerApplyLoan")->name('borrow.apply');
+        Route::get("/borrower/dashboard/logout", "BorrowerLogout")->name('borrow.logout');
     });
 });
 

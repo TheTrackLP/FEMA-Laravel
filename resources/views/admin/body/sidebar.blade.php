@@ -81,7 +81,7 @@
             </div>
             <div class="sb-sidenav-footer side_foot">
                 <div class="small">Logged in as:
-                    <a href="" class="btn btn-danger float-end"><i
+                    <a href="{{route('admin.logout')}}" class="btn btn-danger float-end"><i
                             class="fa-solid fa-power-off"></i></a>
                 </div>
                 Start Bootstrap
