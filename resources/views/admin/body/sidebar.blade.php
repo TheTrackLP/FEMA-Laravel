@@ -38,7 +38,7 @@
             <div class="sb-sidenav-menu">
                 <img class="rounded-circle py-1 mb-3" src="{{ asset('assets/img/filamer.png') }}">
                 <div class="nav">
-                    <a class="nav-link button-hover" href="">
+                    <a class="nav-link button-hover" href="{{ route('admin.dash')}}">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-house"></i></div>
                         Home
                     </a>
