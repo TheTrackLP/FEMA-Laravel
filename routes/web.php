@@ -60,6 +60,7 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
 
     Route::controller(ReportController::class)->group(function(){
         Route::get('/admin/reports', 'ReportLoan')->name('report');
+        Route::get('/admin/report/this-month', 'ReportSelectDate')->name('report.date');
     });
 
     Route::controller(DepartmentController::class)->group(function(){

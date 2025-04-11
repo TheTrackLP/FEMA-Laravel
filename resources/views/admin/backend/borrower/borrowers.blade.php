@@ -10,7 +10,7 @@
             <div class="row mb-3">
                 <div class="col-lg-4">
                     <label for="">Office/Departmnet</label>
-                    <select name="" id="" class="form-select select2">
+                    <select name="" id="fDept" class="form-select select2">
                         <option value=""></option>
                         @foreach ($depts as $dept)
                         <option value="{{ $dept->id }}">{{ $dept->dept_name }}</option>
@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-lg-4">
                     <label for="">Status</label>
-                    <select name="" id="" class="form-select select2">
+                    <select name="" id="fStatus" class="form-select select2">
                         <option value=""></option>
                         <option value="0">New Member</option>
                         <option value="1">Exist Member</option>
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <hr>
-            <table class="table table-bordered" id="borrowerTable">
+            <table class="table table-bordered" id="filterTable">
                 <thead class="table-info">
                     <tr>
                         <th class="text-center">#</th>

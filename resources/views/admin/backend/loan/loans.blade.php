@@ -16,19 +16,22 @@
             <div class="row">
                 <div class="col-md-4">
                     <label for="">Type of Loan</label>
-                    <select name="" id="" class="form-select">
+                    <select name="fPlan" id="fPlan" class="form-select select2">
                         <option value=""></option>
+                        @foreach ($plans as $plan)
+                        <option value="{{ $plan->plan_name }}">{{ $plan->plan_name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label for="">Status</label>
-                    <select name="" id="" class="form-select">
+                    <select name="fStatus" id="fStatus" class="form-select select2">
                         <option value=""></option>
                     </select>
                 </div>
             </div>
             <hr>
-            <table class="table table-bordered" id="borrowerTable">
+            <table class="table table-bordered" id="filterTable">
                 <thead class="table-info">
                     <tr>
                         <th class="text-center">#</th>
@@ -58,7 +61,7 @@
                         <td class="text-center">{{$loan->borrower_ref}}</td>
                         <td>
                             <p>Name: <b>{{ $loan->borrow }}</b></p>
-                            <p class="uppercase">Plan: <b>{{ $loan->plan }}</b></p>
+                            <p>Plan: <b class="">{{ $loan->plan }}</b></p>
                         </td>
                         <td>
                             <p>Capital: <b>{{ number_format($loan->shared_capital, 2) }}</b></p>

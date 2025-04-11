@@ -18,7 +18,7 @@
                 </div>
             </div>
             <hr>
-            <table class="table table-bordered" id="borrowerTable">
+            <table class="table table-bordered" id="filterTable">
                 <thead class="table-info">
                     <tr>
                         <th class="text-center">#</th>
