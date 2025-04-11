@@ -12,7 +12,7 @@ class DepartmentController extends Controller
     public function DepartmentsLists()
     {
         $depts = Departments::all();
-        return view('admin.backend.dept.departments', compact('depts'));
+        return view('admin.backend.departments', compact('depts'));
     }
 
     public function DepartmentStore(Request $request)

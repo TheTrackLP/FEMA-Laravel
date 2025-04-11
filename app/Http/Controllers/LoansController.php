@@ -35,7 +35,7 @@ class LoansController extends Controller
                             ->where('borrowers.status', 1)
                             ->get();
         $plans = LoanPlans::all();
-        return view('admin.backend.loan.loans', compact('borrowers', 'plans', 'loans'));
+        return view('admin.backend.loans', compact('borrowers', 'plans', 'loans'));
     }
 
     public function GetBorrower($id)

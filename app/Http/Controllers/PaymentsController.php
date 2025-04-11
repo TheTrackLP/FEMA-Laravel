@@ -34,7 +34,7 @@ class PaymentsController extends Controller
             ->join('loan_plans', 'loan_plans.id', '=', 'loan_lists.plan_id')
             ->where('loan_lists.status', 2)
             ->get();
-        return view('admin.backend.payment.payments', compact('loans', 'payees'));
+        return view('admin.backend.payments', compact('loans', 'payees'));
     }
 
     public function GetLoanData($id)

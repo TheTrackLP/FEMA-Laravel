@@ -13,7 +13,7 @@ class LoanPlansController extends Controller
     public function LoanPlanLists()
     {
         $plans = LoanPlans::all();
-        return view('admin.backend.loan_plans.plans', compact('plans'));
+        return view('admin.backend.plans', compact('plans'));
     }
 
     public function AddLoanPlan(Request $request)

@@ -27,7 +27,7 @@ class BorrowersController extends Controller
                             ->join('departments', 'departments.id', '=', 'borrowers.dept_id')
                             ->get();
         $depts = Departments::all();
-        return view('admin.backend.borrower.borrowers', compact('borrowers', 'depts'));
+        return view('admin.backend.borrowers', compact('borrowers', 'depts'));
     }
 
     public function BorrowerDetails($id)
