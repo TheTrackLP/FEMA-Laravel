@@ -1,11 +1,14 @@
 @extends('admin.body.header')
 @section('admin')
-
+@php
+$curr_date = date('F j, Y, g:i a');
+@endphp
 <div class="container-fluid">
     <div class="mt-3"></div>
     <div class="card">
         <div class="card-header">
-            <button class="btn btn-primary btn-lg px-3 float-end" data-bs-toggle="modal" data-bs-target="#modalPayment"><i class="fa-solid fa-plus"></i> New Payments</button>
+            <button class="btn btn-primary btn-lg px-3 float-end" data-bs-toggle="modal"
+                data-bs-target="#modalPayment"><i class="fa-solid fa-plus"></i> New Payments</button>
             <h3>Payments History</h3>
         </div>
         <div class="card-body">
@@ -34,8 +37,12 @@
                 <tr>
                     <td class="text-center">1</td>
                     <td>
-                        <small><p>Loan Ref. #: <b>{{ $payee->loan_refno }}</b></p></small>
-                        <small><p>OR. #: <b>{{ $payee->off_rec }}</b></p></small>
+                        <small>
+                            <p>Loan Ref. #: <b>{{ $payee->loan_refno }}</b></p>
+                        </small>
+                        <small>
+                            <p>OR. #: <b>{{ $payee->off_rec }}</b></p>
+                        </small>
                     </td>
                     <td>
                         <p>Name: <b>{{ $payee->borrow }}</b></p>
@@ -59,77 +66,101 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalPayment" tabindex="-1">
+<div class="modal fade" id="modalPayment" tabindex="-1" aria-labelledby="modalPaymentLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form action="{{route('pay.add')}}" method="post">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <form action="{{ route('pay.add') }}" method="POST">
                 @csrf
-                <div class="modal-header">
-                    <h4>Payment Form</h4>
+                <div class="modal-header bg-success bg-opacity-10 border-0">
+                    <h4 class="modal-title fw-bold text-success" id="modalPaymentLabel">
+                        <i class="bi bi-credit-card me-2"></i> Payment Form
+                    </h4>
+                    {{ $curr_date }}
                 </div>
+
                 <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label for="">Name: | Plan:</label>
-                        <select name="loan_id" id="loan_id" class="paymentSelect2">
-                            <option value=""></option>
+                    <!-- Loan selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Select Borrower & Plan</label>
+                        <select name="loan_id" id="loan_id" class="form-select paymentSelect2" required>
+                            <option value="">Choose a borrower...</option>
                             @foreach ($loans as $row)
                             <option value="{{ $row->id }}">{{ $row->borrow }} | {{ $row->plan }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <hr class="my-5">
-                    <div class="row mb-3">
+
+                    <hr class="my-4">
+
+                    <div class="row g-4">
+                        <!-- Column 1 -->
                         <div class="col-md-4">
-                            <div class="form-group mb-3">
-                                <input type="hidden" name="plan_id" id="plan">
-                                <input type="hidden" name="borrower_id" id="borrower">
-                                <label for="">OR. #:</label>
-                                <input type="number" name="off_rec" class="form-control">
+                            <input type="hidden" name="plan_id" id="plan">
+                            <input type="hidden" name="borrower_id" id="borrower">
+
+                            <div class="mb-3">
+                                <label class="form-label">Official Receipt #</label>
+                                <input type="number" name="off_rec" class="form-control" placeholder="Enter OR number"
+                                    required>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="">Remaining Balance:</label>
-                                <input type="number" name="amount_balance" id="amount_balance" class="form-control" readonly>
+
+                            <div class="mb-3">
+                                <label class="form-label">Remaining Balance</label>
+                                <input type="number" name="amount_balance" id="amount_balance" class="form-control"
+                                    readonly>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="">Shared Capital:</label>
+
+                            <div class="mb-3">
+                                <label class="form-label">Shared Capital</label>
                                 <input type="number" name="capital" id="capital" class="form-control" readonly>
                             </div>
                         </div>
+
+                        <!-- Column 2 -->
                         <div class="col-md-4">
                             <div class="row">
-                                <div class="col form-group mb-3">
-                                    <label for="">Principal</label>
-                                    <input type="number" name="paid" class="form-control">
+                                <div class="col mb-3">
+                                    <label class="form-label">Principal</label>
+                                    <input type="number" name="paid" class="form-control" placeholder="₱" step="any">
                                 </div>
-                                <div class="col form-group mb-3">
-                                    <label for="">Interest:</label>
-                                    <input type="number" name="interest" class="form-control" step="any">
+                                <div class="col mb-3">
+                                    <label class="form-label">Interest</label>
+                                    <input type="number" name="interest" class="form-control" placeholder="₱"
+                                        step="any">
                                 </div>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="">Paid-in Capital:</label>
-                                <input type="number" name="capital" class="form-control">
+
+                            <div class="mb-3">
+                                <label class="form-label">Paid-in Capital</label>
+                                <input type="number" name="capital_paid" class="form-control" placeholder="₱"
+                                    step="any">
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="">Penalty:</label>
-                                <input type="number" name="penalty" class="form-control">
+
+                            <div class="mb-3">
+                                <label class="form-label">Penalty</label>
+                                <input type="number" name="penalty" class="form-control" placeholder="₱" step="any">
                             </div>
                         </div>
+
+                        <!-- Column 3 (Summary) -->
                         <div class="col-md-4">
-                            <div class="form-group mb-3">
-                                <p>Principal: <b></b></p>
-                            </div>
-                            <div class="form-group mb-3">
-                                <p>Interest: <b></b></p>
-                            </div>
-                            <div class="form-group mb-3">
-                                <p>Penalty: <b></b></p>
+                            <div class="bg-light rounded p-3 h-100">
+                                <h6 class="fw-bold text-muted mb-3">Summary</h6>
+                                <p class="mb-2">Principal: <b id="summaryPrincipal">₱0.00</b></p>
+                                <p class="mb-2">Interest: <b id="summaryInterest">₱0.00</b></p>
+                                <p class="mb-2">Penalty: <b id="summaryPenalty">₱0.00</b></p>
+                                <hr>
+                                <p class="fw-bold mb-0">Total: <span id="summaryTotal">₱0.00</span></p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success btn-lg px-5">Save</button>
+
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success px-5">
+                        <i class="bi bi-save me-1"></i> Save Payment
+                    </button>
                 </div>
             </form>
         </div>
@@ -137,22 +168,39 @@
 </div>
 
 <script>
-    $(document).ready(function(){
-        $("#loan_id").change(function(){
-            var loan_id = $(this).val();
-
-            $.ajax({
-                type: "GET",
-                url: "/admin/payments/getLoan/" + loan_id,
-                success: function(res){
-                    console.log(res)
-                    $("#amount_balance").val(res.loanD.amount);
-                    $("#plan").val(res.loanD.plan_id);
-                    $("#capital").val(res.loanD.shared_capital);
-                    $("#borrower").val(res.loanD.borrower_id);
-                }
-            });
-        })
+const inputs = document.querySelectorAll('[name="paid"], [name="interest"], [name="penalty"]');
+inputs.forEach(input => {
+    input.addEventListener('input', () => {
+        const principal = parseFloat(document.querySelector('[name="paid"]').value) || 0;
+        const interest = parseFloat(document.querySelector('[name="interest"]').value) || 0;
+        const penalty = parseFloat(document.querySelector('[name="penalty"]').value) || 0;
+        const total = principal + interest + penalty;
+        document.getElementById('summaryPrincipal').textContent = `₱${principal.toFixed(2)}`;
+        document.getElementById('summaryInterest').textContent = `₱${interest.toFixed(2)}`;
+        document.getElementById('summaryPenalty').textContent = `₱${penalty.toFixed(2)}`;
+        document.getElementById('summaryTotal').textContent = `₱${total.toFixed(2)}`;
     });
+});
+</script>
+
+
+<script>
+$(document).ready(function() {
+    $("#loan_id").change(function() {
+        var loan_id = $(this).val();
+
+        $.ajax({
+            type: "GET",
+            url: "/admin/payments/getLoan/" + loan_id,
+            success: function(res) {
+                console.log(res)
+                $("#amount_balance").val(res.loanD.amount);
+                $("#plan").val(res.loanD.plan_id);
+                $("#capital").val(res.loanD.shared_capital);
+                $("#borrower").val(res.loanD.borrower_id);
+            }
+        });
+    })
+});
 </script>
 @endsection

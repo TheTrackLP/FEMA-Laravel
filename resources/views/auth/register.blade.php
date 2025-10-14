@@ -165,9 +165,6 @@ $depts = App\Models\Departments::all();
                                 <label class="labels mb-2">Confirm Password:</label>
                                 <input type="password" class="form-control" name="password_confirmation"
                                     placeholder="*******">
-                                @error('confirm_password')
-                                <p class="text-danger">{{ $message }}</p>
-                                @enderror
                             </div>
                         </div>
                         <div class="mt-5 text-center">
@@ -228,9 +225,6 @@ $(document).ready(function() {
             password: {
                 required: true,
             },
-            password_confirmation: {
-                required: true,
-            },
 
         },
         messages: {
@@ -269,9 +263,6 @@ $(document).ready(function() {
             },
             password: {
                 required: 'Please Enter Password',
-            },
-            password_confirmation: {
-                required: 'Please Enter Confirm Password',
             },
         },
         errorElement: 'span',

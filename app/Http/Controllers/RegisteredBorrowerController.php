@@ -38,7 +38,7 @@ class RegisteredBorrowerController extends Controller
             'username' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'confirm_password' => 'required',
+            'password_confirmation' => 'required',
         ]);
 
         if($valid->fails()) {
@@ -59,7 +59,7 @@ class RegisteredBorrowerController extends Controller
                                 ]);
         }
 
-        if ($request->password != $request->confirm_password) {
+        if ($request->password != $request->password_confirmation) {
             return redirect()->route('register')
             ->withErrors($AuthValid)
             ->with([
