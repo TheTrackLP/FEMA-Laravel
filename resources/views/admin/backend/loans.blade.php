@@ -2,14 +2,15 @@
 @section('admin')
 
 <style>
-    .radio{
-        font-size: 23px;
-    }
+.radio {
+    font-size: 23px;
+}
 </style>
 <div class="container-fluid mt-3">
     <div class="card">
         <div class="card-header">
-            <button type="button" class="btn btn-primary float-end" id="clear" data-bs-toggle="modal" data-bs-target="#addApplication"><i class="fa-solid fa-plus"></i> Create New Application</button>
+            <button type="button" class="btn btn-primary float-end" id="clear" data-bs-toggle="modal"
+                data-bs-target="#addApplication"><i class="fa-solid fa-plus"></i> Create New Application</button>
             <h3>Loan Lists</h3>
         </div>
         <div class="card-body">
@@ -45,17 +46,17 @@
                 </thead>
                 <tbody>
                     @php
-                        $i = 1;
+                    $i = 1;
                     @endphp
                     @foreach ($loans as $loan)
                     @php
-                        $offset = App\Models\Payments::where('loan_id', $loan->id)->count();
-                        $next = App\Models\LoanSchedules::select('date_due')->where('loan_id', $loan->id)
-                                                ->limit(1)->offset($offset)->get();
-                        $interest = ($loan->amount * $loan->interest_percentage/100);
-                        $penalty = ($loan->amount * $loan->penalty_rate/100);
-                        $curr_date = Carbon\Carbon::now();
-                    @endphp 
+                    $offset = App\Models\Payments::where('loan_id', $loan->id)->count();
+                    $next = App\Models\LoanSchedules::select('date_due')->where('loan_id', $loan->id)
+                    ->limit(1)->offset($offset)->get();
+                    $interest = ($loan->amount * $loan->interest_percentage/100);
+                    $penalty = ($loan->amount * $loan->penalty_rate/100);
+                    $curr_date = Carbon\Carbon::now();
+                    @endphp
                     <tr>
                         <td class="text-center">{{$i++}}</td>
                         <td class="text-center">{{$loan->borrower_ref}}</td>
@@ -70,23 +71,25 @@
                         <td>
                             @if ($loan->status == 2)
                             @foreach ($next as $nextDate)
-                           <small><p><b>{{ date('M d, Y', strtotime($nextDate->date_due)) }}</b></p></small>
+                            <small>
+                                <p><b>{{ date('M d, Y', strtotime($nextDate->date_due)) }}</b></p>
+                            </small>
                             @endforeach
                             @php
-                                $withInterest = Carbon\Carbon::parse($nextDate->date_due)->format('d')
+                            $withInterest = Carbon\Carbon::parse($nextDate->date_due)->format('d')
                             @endphp
-                            @if ($withInterest >= 1 && $withInterest <= 15)
-                            <p class="text-primary">Principal: <b>500.00</b></p>
-                            @elseif ($withInterest >= 6 && $withInterest <= 31)
-                            <p class="text-primary">Principal: <b>500.00</b></p>
-                            <p class="text-danger">Interest: <b>{{ number_format($interest, 2) }}</b></p>
-                            @endif
-                            @if($curr_date >= $nextDate->date_due)
-                            <p class="text-danger">Penalty: <b>{{ $penalty }}</b></p>
-                            @endif
-                            @else
-                            <p class="text-center">N/A</p>
-                            @endif
+                            @if ($withInterest >= 1 && $withInterest <= 15) <p class="text-primary">Principal:
+                                <b>500.00</b></p>
+                                @elseif ($withInterest >= 6 && $withInterest <= 31) <p class="text-primary">Principal:
+                                    <b>500.00</b></p>
+                                    <p class="text-danger">Interest: <b>{{ number_format($interest, 2) }}</b></p>
+                                    @endif
+                                    @if($curr_date >= $nextDate->date_due)
+                                    <p class="text-danger">Penalty: <b>{{ $penalty }}</b></p>
+                                    @endif
+                                    @else
+                                    <p class="text-center">N/A</p>
+                                    @endif
                         </td>
                         <td class="text-center">
                             @if ($loan->status == 0)
@@ -102,8 +105,10 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            <button type="button" value="{{$loan->id}}" id="editApplicant" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye"></i></button>
-                            <button type="button" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash-can"></i></button>
+                            <button type="button" value="{{$loan->id}}" id="editApplicant"
+                                class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye"></i></button>
+                            <button type="button" class="btn btn-outline-danger btn-sm"><i
+                                    class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
                     @endforeach
@@ -114,7 +119,7 @@
 </div>
 <div class="modal fade" id="addApplication" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <form action="{{route('loans.store')}}" id="applicantForm" method="post">
+        <form action="{{route('loans.store')}}" id="applicantForm" method="post" class="myForm">
             @csrf
             <input type="hidden" name="id" id="id">
             <div class="modal-content">
@@ -148,23 +153,36 @@
                         </div>
                     </div>
                     <div class="row mb-5">
-                        <div class="col-md-6">
+                        <div class="form-group col-md-6">
                             <label for="">Loan Plan:</label>
-                            <select name="plan_id" id="plan_id" class="appliSelect2">
+                            <select name="plan_id" id="plan_id"
+                                class="appliSelect2 @error('plan_id') is-invalid @enderror">
                                 <option value=""></option>
                                 @foreach ($plans as $plan)
-                                <option value="{{$plan->id}}">{{ $plan->plan_name }} | {{$plan->interest_percentage}}% | {{ $plan->penalty_rate }}%</option>
+                                <option value="{{$plan->id}}">{{ $plan->plan_name }} | {{$plan->interest_percentage}}% |
+                                    {{ $plan->penalty_rate }}%</option>
                                 @endforeach
                             </select>
                             <small>Plan [interest%, Penalty%]</small><br>
+                            @error('plan_id')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
                             <div class="form-group mt-3">
                                 <label for="">Amount Borrowed:</label>
-                                <input type="number" name="amount" id="amount" class="form-control">
+                                <input type="number" name="amount" id="amount"
+                                    class="form-control @error('amount') is-invalid @enderror">
                             </div>
+                            @error('amount')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label for="">Purpose:</label>
-                            <textarea name="purpose" id="purpose" cols="30" rows="5" class="form-control"></textarea>
+                            <textarea name="purpose" id="purpose" cols="30" rows="5"
+                                class="form-control @error('purpose') is-invalid @enderror"></textarea>
+                            @error('purpose')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="row mb-3 justify-content-center status_radio">
@@ -195,63 +213,113 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.myForm').validate({
+        rules: {
+            borrower_id: {
+                required: true,
+            },
+            amount: {
+                required: true,
+            },
+            amount: {
+                required: true,
+            },
+            purpose: {
+                required: true,
+            },
+            status: {
+                required: true,
+            },
+        },
+        messages: {
+            borrower_id: {
+                required: 'Please Enter First Name',
+            },
+            amount: {
+                required: 'Please Enter Amount',
+            },
+            amount: {
+                required: 'Please Enter Amount',
+            },
+            purpose: {
+                required: 'Please Enter Purpose',
+            },
+            status: {
+                required: 'Please Select Status',
+            },
+        },
+        errorElement: 'span',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+    });
+});
+</script>
 <script>
-
-    $(document).on('click', '#clear', function(){
-        $("#applicantForm")[0].reset();
-        $("#id").val("");
-        $("#borrower_id").val("").trigger("change");
-        $("#plan_id").val("").trigger("change");
-        $("#years_serv").val("").trigger("change");
-        $(".status_radio").css("display", "none");
-        $(':input[type="submit"]').prop('disabled', false);
-        $("#applicantForm").attr("action", "{{ route('loans.store') }}"); 
-    })
-$(document).ready(function(){
-    $("#borrower_id").change(function(){
+$(document).on('click', '#clear', function() {
+    $("#applicantForm")[0].reset();
+    $("#id").val("");
+    $("#borrower_id").val("").trigger("change");
+    $("#plan_id").val("").trigger("change");
+    $("#years_serv").val("").trigger("change");
+    $(".status_radio").css("display", "none");
+    $(':input[type="submit"]').prop('disabled', false);
+    $("#applicantForm").attr("action", "{{ route('loans.store') }}");
+})
+$(document).ready(function() {
+    $("#borrower_id").change(function() {
         var borrow_id = $(this).val();
-        
+
         $.ajax({
             type: "GET",
             url: "/admin/loan-lists/getData/" + borrow_id,
-            success: function(res){
+            success: function(res) {
                 $("#shared_cap").val(res.borrow.shared_capital);
                 $("#years_serv").val(res.borrow.years_service).trigger("change");
             }
         })
     });
 
-    $(document).on('click', '#editApplicant', function(){
+    $(document).on('click', '#editApplicant', function() {
         var loan_id = $(this).val();
-       
+
         $("#addApplication").modal('show');
 
         $.ajax({
             type: "GET",
             url: "/admin/loan-lists/applicant/edit/" + loan_id,
-            success: function(res){
+            success: function(res) {
                 $("#borrower_id").val(res.appli.borrower_id).trigger("change");
                 $("#plan_id").val(res.appli.plan_id).trigger("change");
                 $("#amount").val(res.appli.amount);
                 $("#purpose").val(res.appli.purpose);
                 $("#id").val(loan_id);
-                $("#applicantForm").attr("action", "{{ route('loans.update') }}"); 
-                
+                $("#applicantForm").attr("action", "{{ route('loans.update') }}");
+
                 var status = res.appli.status;
                 if (status === 0) {
                     $(".active").css("display", "none");
-                }else if(status === 2){
+                } else if (status === 2) {
                     $(".status_radio").css("display", "none");
                     $(':input[type="submit"]').prop('disabled', true);
                 } else {
                     $(".status_radio").css({
-                        "display" : "flex",
-                        "justify-content" : "center",
+                        "display": "flex",
+                        "justify-content": "center",
                     });
                     $(':input[type="submit"]').prop('disabled', false);
                     $(".active").css({
-                        "display" : "flex",
-                        "justify-content" : "center",
+                        "display": "flex",
+                        "justify-content": "center",
                     });
                 }
             }
