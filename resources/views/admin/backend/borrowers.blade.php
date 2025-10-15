@@ -21,8 +21,8 @@
                     <label for="">Status</label>
                     <select name="" id="fStatus" class="form-select select2">
                         <option value=""></option>
-                        <option value="0">New Member</option>
-                        <option value="1">Exist Member</option>
+                        <option value="0">New Applicant</option>
+                        <option value="1">Existing Member</option>
                     </select>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <tbody>
                     @foreach ($borrowers as $data)
                     @php
-                     $i = 1;   
+                    $i = 1;
                     @endphp
                     <tr>
                         <td class="text-center">{{ $i++ }}</td>
@@ -53,16 +53,18 @@
                         <td class="text-center">{{ $data->dept }}</td>
                         <td class="text-center">
                             @if($data->status == 0)
-                            <span class="badge rounded-pill text-bg-secondary">New</span>
-                            @elseif($data->status  == 1)
-                            <span class="badge rounded-pill text-bg-primary">Exist</span>
+                            <span class="badge rounded-pill text-bg-secondary">New Applicant</span>
+                            @elseif($data->status == 1)
+                            <span class="badge rounded-pill text-bg-primary">Existing Member</span>
                             @else
                             @endif
                         </td>
                         <td class="text-center">{{ date('M d, Y', strtotime($data->created_at)) }}</td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-warning btn-sm" value="{{$data->id}}" id="EditB"><i class="fa-solid fa-pen-to-square"></i></button>             
-                            <a href="{{route('borrow.delete', $data->id)}}" id="delete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i></a>
+                            <button type="button" class="btn btn-warning btn-sm" value="{{$data->id}}" id="EditB"><i
+                                    class="fa-solid fa-pen-to-square"></i></button>
+                            <a href="{{route('borrow.delete', $data->id)}}" id="delete" class="btn btn-danger btn-sm"><i
+                                    class="fa-solid fa-trash-can"></i></a>
                         </td>
                     </tr>
                     @endforeach
@@ -73,121 +75,156 @@
 </div>
 
 <script>
-    $(document).ready(function(){
-        $(document).on('click', '#EditB', function(){
-            var borrower_id = $(this).val();
+$(document).ready(function() {
+    $(document).on('click', '#EditB', function() {
+        var borrower_id = $(this).val();
 
-            $("#editBorrower").modal("show");
+        $("#editBorrower").modal("show");
 
-            $.ajax({
-                type: "GET",
-                url: "/admin/borrower/show/" + borrower_id,
-                success: function(res){
-                    $("#firstname").val(res.borrower.firstname);
-                    $("#middlename").val(res.borrower.middlename);
-                    $("#lastname").val(res.borrower.lastname);
-                    $("#date_birth").val(res.borrower.date_birth);
-                    $("#contact_no").val(res.borrower.contact_no);
-                    $("#years_service").val(res.borrower.years_service);
-                    $("#address").val(res.borrower.address);
-                    $("#emp_id").val(res.borrower.emp_id);
-                    $("#shared_capital").val(res.borrower.shared_capital);
-                    $("#dept_id").val(res.borrower.dept_id);
-                    $("#status").val(res.borrower.status);
-                    $("#id").val(borrower_id);
-                }
-            });
+        $.ajax({
+            type: "GET",
+            url: "/admin/borrower/show/" + borrower_id,
+            success: function(res) {
+                $("#firstname").val(res.borrower.firstname);
+                $("#middlename").val(res.borrower.middlename);
+                $("#lastname").val(res.borrower.lastname);
+                $("#date_birth").val(res.borrower.date_birth);
+                $("#contact_no").val(res.borrower.contact_no);
+                $("#years_service").val(res.borrower.years_service);
+                $("#address").val(res.borrower.address);
+                $("#emp_id").val(res.borrower.emp_id);
+                $("#shared_capital").val(res.borrower.shared_capital);
+                $("#dept_id").val(res.borrower.dept_id);
+                $("#status").val(res.borrower.status);
+                $("#id").val(borrower_id);
+            }
         });
     });
+});
 </script>
 
-<div class="modal fade" id="editBorrower">
-    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-len">
+<div class="modal fade" id="editBorrower" tabindex="-1" aria-labelledby="editBorrowerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
-            <form action="{{route('borrow.update')}}" method="post">
+            <form action="{{ route('borrow.update') }}" method="POST">
                 @csrf
+                <input type="hidden" name="id" id="id">
+
                 <div class="modal-header">
-                    <h3>Edit Borrower</h3>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="editBorrowerLabel">
+                        <i class="fa fa-user-edit me-2"></i> Edit Borrower
+                    </h4>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
-                <div class="modal-body my-5">
-                    <div class="row">
-                        <div class="col-lg-2 mb-4">
-                            <input type="hidden" name="id" id="id">
-                            <label for="">Employee ID</label>
-                            <input type="text" name="emp_id" id="emp_id" class="form-control">
+
+                <div class="modal-body py-4">
+                    <!-- Basic Info -->
+                    <h5 class="text-primary mb-3 border-bottom pb-2">
+                        <i class="fa fa-id-card me-2"></i> Basic Information
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="emp_id" class="form-label">Employee ID</label>
+                            <input type="text" name="emp_id" id="emp_id" class="form-control" placeholder="EMP12345">
                         </div>
-                        <div class="col-lg-2 mb-4">
-                            <label for="">Shared Capital</label>
-                            <input type="text" name="shared_capital" id="shared_capital" class="form-control">
+
+                        <div class="col-md-2">
+                            <label for="shared_capital" class="form-label">Shared Capital</label>
+                            <input type="number" name="shared_capital" id="shared_capital" class="form-control"
+                                placeholder="e.g. 5000">
                         </div>
-                        <div class="col-lg-3 mb-3">
-                            <label for="">Department</label>
+
+                        <div class="col-md-4">
+                            <label for="dept_id" class="form-label">Department</label>
                             <select name="dept_id" id="dept_id" class="form-select editBorrower">
-                                <option value=""></option>
-                                <option value="0">Pending</option>
-                                <option value="1">Member</option>
+                                <option value="" selected disabled>Select Department</option>
+                                @foreach ($depts as $dept)
+                                <option value="{{ $dept->id }}">{{ $dept->dept_name }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <div class="col-lg-3 mb-3">
-                            <label for="">Status</label>
-                            <select name="status" id="status" class="form-control">
-                                <option value=""></option>
-                                <option value="0">Pending</option>
-                                <option value="1">Member</option>
+
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="" selected disabled>Select Status</option>
+                                <option value="0">New Applicant</option>
+                                <option value="1">Existing Member</option>
                             </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="row">
-                                <div class="col-lg-4 mb-4">
-                                    <label for="">First Name</label>
-                                    <input type="text" name="firstname" id="firstname" class="form-control">
-                                </div>
-                                <div class="col-lg-4 mb-4">
-                                    <label for="">Middle Name</label>
-                                    <input type="text" name="middlename" id="middlename" class="form-control">
-                                </div>
-                                <div class="col-lg-4 mb-4">
-                                    <label for="">Last Name</label>
-                                    <input type="text" name="lastname" id="lastname" class="form-control">
-                                </div>
-                                <div class="col-lg-4 mb-4">
-                                    <label for="">Date of Birth</label>
-                                    <input type="date" name="date_birth" id="date_birth" class="form-control">
-                                </div>
-                                <div class="col-lg-4 mb-4">
-                                    <label for="">Contact No:</label>
-                                    <input type="text" name="contact_no" id="contact_no" class="form-control">
-                                </div>
-                                <div class="col-lg-4 mb-4">
-                                    <label for="">Year of Service</label>
-                                    <select name="years_service" id="years_service" class="form-select">
-                                        <option value="" selected disable>Select Here:</option>
-                                        <option value="1">1-4 Years</option>
-                                        <option value="2">5-9 Years</option>
-                                        <option value="3">10-Up Years</option>
-                                    </select>
-                                </div>
-                            </div>
+
+                    <!-- Personal Info -->
+                    <h5 class="text-primary mt-5 mb-3 border-bottom pb-2">
+                        <i class="fa fa-user me-2"></i> Personal Information
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="firstname" class="form-label">First Name</label>
+                            <input type="text" name="firstname" id="firstname" class="form-control" placeholder="Juan">
                         </div>
-                        <div class="col-lg-4">
-                            <div class="row">
-                                <div class="col">
-                                    <label for="">Address</label>
-                                    <textarea name="address" id="address" rows="7" class="form-control"></textarea>
-                                </div>
-                            </div>
+
+                        <div class="col-md-4">
+                            <label for="middlename" class="form-label">Middle Name</label>
+                            <input type="text" name="middlename" id="middlename" class="form-control"
+                                placeholder="Santos">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="lastname" class="form-label">Last Name</label>
+                            <input type="text" name="lastname" id="lastname" class="form-control"
+                                placeholder="Dela Cruz">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="date_birth" class="form-label">Date of Birth</label>
+                            <input type="date" name="date_birth" id="date_birth" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="contact_no" class="form-label">Contact Number</label>
+                            <input type="text" name="contact_no" id="contact_no" class="form-control"
+                                placeholder="09XXXXXXXXX">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="years_service" class="form-label">Years of Service</label>
+                            <select name="years_service" id="years_service" class="form-select">
+                                <option value="" selected disabled>Select Duration</option>
+                                <option value="1">1–4 Years</option>
+                                <option value="2">5–9 Years</option>
+                                <option value="3">10+ Years</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <h5 class="text-primary mt-5 mb-3 border-bottom pb-2">
+                        <i class="fa fa-map-marker-alt me-2"></i> Address
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <textarea name="address" id="address" rows="4" class="form-control"
+                                placeholder="Enter complete address..."></textarea>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success btn-lg float-end px-3">Save Changes</button>
+
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="fa fa-save me-1"></i> Save Changes
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 
 @endsection

@@ -80,7 +80,7 @@
                             @endphp
                             @if ($withInterest >= 1 && $withInterest <= 15) <p class="text-primary">Principal:
                                 <b>500.00</b></p>
-                                @elseif ($withInterest >= 6 && $withInterest <= 31) <p class="text-primary">Principal:
+                                @elseif ($withInterest >= 16 && $withInterest <= 31) <p class="text-primary">Principal:
                                     <b>500.00</b></p>
                                     <p class="text-danger">Interest: <b>{{ number_format($interest, 2) }}</b></p>
                                     @endif
