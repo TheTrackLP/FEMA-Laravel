@@ -14,10 +14,10 @@
             <h3>Loan Lists</h3>
         </div>
         <div class="card-body">
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-md-4">
                     <label for="">Type of Loan</label>
-                    <select name="fPlan" id="fPlan" class="form-select select2">
+                    <select name="" id="loansPlans" class="form-select select2">
                         <option value=""></option>
                         @foreach ($plans as $plan)
                         <option value="{{ $plan->plan_name }}">{{ $plan->plan_name }}</option>
@@ -26,13 +26,18 @@
                 </div>
                 <div class="col-md-4">
                     <label for="">Status</label>
-                    <select name="fStatus" id="fStatus" class="form-select select2">
-                        <option value=""></option>
+                    <select name="" id="loansStatus" class="form-select select2">
+                        <option value="" selected disabled>Select an Option</option>
+                        <option value="For Approval">For Approval</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Active">Active</option>
+                        <option value="Denied">Denied</option>
+                        <option value="Complete">Complete</option>
                     </select>
                 </div>
             </div>
             <hr>
-            <table class="table table-bordered" id="filterTable">
+            <table class="table table-bordered" id="loansTable">
                 <thead class="table-info">
                     <tr>
                         <th class="text-center">#</th>
@@ -58,17 +63,17 @@
                     $curr_date = Carbon\Carbon::now();
                     @endphp
                     <tr>
-                        <td class="text-center">{{$i++}}</td>
-                        <td class="text-center">{{$loan->borrower_ref}}</td>
-                        <td>
+                        <td class="text-center align-middle">{{$i++}}</td>
+                        <td class="text-center align-middle">{{$loan->borrower_ref}}</td>
+                        <td class="align-middle">
                             <p>Name: <b>{{ $loan->borrow }}</b></p>
                             <p>Plan: <b class="">{{ $loan->plan }}</b></p>
                         </td>
-                        <td>
+                        <td class="align-middle">
                             <p>Capital: <b>{{ number_format($loan->shared_capital, 2) }}</b></p>
                             <p>Balance: <b>{{ number_format($loan->amount, 2) }}</b></p>
                         </td>
-                        <td>
+                        <td class="align-middle">
                             @if ($loan->status == 2)
                             @foreach ($next as $nextDate)
                             <small>
@@ -80,7 +85,7 @@
                             @endphp
                             @if ($withInterest >= 1 && $withInterest <= 15) <p class="text-primary">Principal:
                                 <b>500.00</b></p>
-                                @elseif ($withInterest >= 6 && $withInterest <= 31) <p class="text-primary">Principal:
+                                @elseif ($withInterest >= 16 && $withInterest <= 31) <p class="text-primary">Principal:
                                     <b>500.00</b></p>
                                     <p class="text-danger">Interest: <b>{{ number_format($interest, 2) }}</b></p>
                                     @endif
@@ -91,7 +96,7 @@
                                     <p class="text-center">N/A</p>
                                     @endif
                         </td>
-                        <td class="text-center">
+                        <td class="text-center  align-middle">
                             @if ($loan->status == 0)
                             <span class="badge rounded-pill text-bg-warning">For Approval</span>
                             @elseif ($loan->status == 1)
@@ -104,7 +109,7 @@
                             <span class="badge rounded-pill text-bg-success">Complete</span>
                             @endif
                         </td>
-                        <td class="text-center">
+                        <td class="text-center align-middle">
                             <button type="button" value="{{$loan->id}}" id="editApplicant"
                                 class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye"></i></button>
                             <button type="button" class="btn btn-outline-danger btn-sm"><i
@@ -130,12 +135,16 @@
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label for="borrower">Borrower:</label>
-                        <select name="borrower_id" id="borrower_id" class="appliSelect2">
+                        <select name="borrower_id" id="borrower_id" class="appliSelect2 @error('borrower_id')
+                        @enderror">
                             <option value=""></option>
                             @foreach ($borrowers as $borrow)
                             <option value="{{$borrow->id}}">{{ $borrow->borrower }}</option>
                             @endforeach
                         </select>
+                        @error('borrower_id')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -220,7 +229,7 @@ $(document).ready(function() {
             borrower_id: {
                 required: true,
             },
-            amount: {
+            plan_id: {
                 required: true,
             },
             amount: {
@@ -235,10 +244,10 @@ $(document).ready(function() {
         },
         messages: {
             borrower_id: {
-                required: 'Please Enter First Name',
+                required: 'Please Select Borrower',
             },
-            amount: {
-                required: 'Please Enter Amount',
+            plan_id: {
+                required: 'Please Select Loan Plan',
             },
             amount: {
                 required: 'Please Enter Amount',

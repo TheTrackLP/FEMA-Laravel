@@ -94,7 +94,7 @@ hr {
                 <a href="{{route('admin.logout')}}" class="btn btn-danger float-end"><i
                         class="fa-solid fa-power-off"></i></a>
             </div>
-            Start Bootstrap
+            {{ $profile->username }}
         </div>
     </nav>
 </div>

@@ -8,6 +8,7 @@ use Validator;
 use App\Models\Borrower;
 use App\Models\LoanLists;
 use App\Models\LoanPlans;
+use App\Models\LoanSchedules;
 use App\Models\Payments;
 
 class PaymentsController extends Controller
@@ -23,6 +24,7 @@ class PaymentsController extends Controller
             ->join('borrowers', 'borrowers.id', '=', 'payments.borrower_id')
             ->join('loan_plans', 'loan_plans.id', '=', 'payments.plan_id')
             ->join('loan_lists', 'loan_lists.id', '=', 'payments.loan_id')
+            ->orderBy('created_at','desc')
             ->get();
 
         $loans = LoanLists::select(
@@ -34,12 +36,28 @@ class PaymentsController extends Controller
             ->join('loan_plans', 'loan_plans.id', '=', 'loan_lists.plan_id')
             ->where('loan_lists.status', 2)
             ->get();
-        return view('admin.backend.payments', compact('loans', 'payees'));
+        $plans = LoanPlans::all();
+        return view('admin.backend.payments', compact('loans', 'payees', 'plans'));
     }
 
     public function GetLoanData($id)
     {
-        $loanD = LoanLists::findorfail($id);
+        $loanD = DB::table('loan_lists')
+                    ->select(
+                        "loan_lists.*",
+                        "loan_plans.interest_percentage",
+                        "loan_plans.penalty_rate",
+                        "loan_schedules.date_due"
+                        )
+                    ->join('loan_plans', 'loan_plans.id', '=', 'loan_lists.plan_id')
+                    ->join('loan_schedules', 'loan_schedules.loan_id', '=', 'loan_lists.id')
+                    ->where([
+                        ["loan_lists.id", "=", $id],
+                        ["loan_schedules.status", "=", 0],
+                        ])
+                    ->orderBy('loan_schedules.date_due')
+                    ->first();
+
         return response()->json([
             'status'=>200,
             'loanD'=>$loanD,
@@ -48,6 +66,7 @@ class PaymentsController extends Controller
 
     public function AddPayment(Request $request)
     {
+        $curr_date = date('Y-m-d H:i:s');
         $valid = Validator::make($request->all(), [
             'off_rec' => 'required',
             'loan_id' => 'required',
@@ -73,6 +92,12 @@ class PaymentsController extends Controller
             'capital'  => $request->capital,
             'penalty'  => $request->penalty,
         ]);
+
+        LoanSchedules::where('loan_id', $request->loan_id)
+            ->where('status', 0)
+            ->orderBy('date_due')
+            ->limit(1)
+            ->update(['status' => 1]);
 
         $curr_balance = LoanLists::select("amount")->where('id', $request->loan_id)->sum('amount');
         $curr_capital = Borrower::select("shared_capital")->where('id', $request->borrower_id)->sum('shared_capital');

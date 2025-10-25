@@ -10,7 +10,7 @@ $y = 1;
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h3>Staff Accounts</h3>    
+                    <h3>Staff Accounts</h3>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -24,7 +24,7 @@ $y = 1;
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($staff_accts as $staff)                                
+                            @foreach ($staff_accts as $staff)
                             <tr>
                                 <td class="text-center">{{ $i++ }}</td>
                                 <td>
@@ -40,8 +40,10 @@ $y = 1;
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-outline-primary btn-sm acctMod" value="{{$staff->id}}"><i class="fa-solid fa-user-pen"></i></button>
-                                    <button class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash-can"></i></button>
+                                    <button class="btn btn-outline-primary btn-sm acctMod" value="{{$staff->id}}"><i
+                                            class="fa-solid fa-user-pen"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm"><i
+                                            class="fa-solid fa-trash-can"></i></button>
                                 </td>
                             </tr>
                             @endforeach
@@ -53,7 +55,7 @@ $y = 1;
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h3>Borrowers Accounts</h3>    
+                    <h3>Borrowers Accounts</h3>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -83,8 +85,10 @@ $y = 1;
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-outline-primary btn-sm acctMod" value="{{ $borrow->id }}"><i class="fa-solid fa-user-pen"></i></button>
-                                    <button class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash-can"></i></button>
+                                    <button class="btn btn-outline-primary btn-sm acctMod" value="{{ $borrow->id }}"><i
+                                            class="fa-solid fa-user-pen"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm"><i
+                                            class="fa-solid fa-trash-can"></i></button>
                                 </td>
                             </tr>
                             @endforeach
@@ -92,7 +96,7 @@ $y = 1;
                     </table>
                 </div>
             </div>
-        </div>    
+        </div>
     </div>
 </div>
 
@@ -151,29 +155,29 @@ $y = 1;
 </div>
 
 <script>
-    $(document).ready(function(){
-        $(document).on('click', '.acctMod', function(){
-            var acct_id = $(this).val();
+$(document).ready(function() {
+    $(document).on('click', '.acctMod', function() {
+        var acct_id = $(this).val();
 
-            $("#acctModal").modal("show");
+        $("#acctModal").modal("show");
 
-            $.ajax({
-                type: "GET",
-                url: "/admin/accounts/info/" + acct_id,
-                success: function(res){
-                    var borrowID = res.acct.borrower_id;
-                    if(borrowID == 0){
-                        $("#acct_name").val(res.acct.username);
-                    }else {
-                        $("#acct_name").val(res.acct.acct_name);
-                    }
-                    $("#username").val(res.acct.username);
-                    $("#acct_stat").val(res.acct.status);
-                    $("#email").val(res.acct.email);
-                    $("#id").val(acct_id);
+        $.ajax({
+            type: "GET",
+            url: "/admin/accounts/info/" + acct_id,
+            success: function(res) {
+                var borrowID = res.acct.borrower_id;
+                if (borrowID == 0) {
+                    $("#acct_name").val(res.acct.username);
+                } else {
+                    $("#acct_name").val(res.acct.acct_name);
                 }
-            })
+                $("#username").val(res.acct.username);
+                $("#acct_stat").val(res.acct.status);
+                $("#email").val(res.acct.email);
+                $("#id").val(acct_id);
+            }
         })
-    });
+    })
+});
 </script>
 @endsection

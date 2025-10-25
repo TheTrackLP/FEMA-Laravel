@@ -4,103 +4,100 @@
 .card:hover {
     transform: scale(1.02);
     transition: transform 0.2s ease-in-out;
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
-
 </style>
 <main>
-    <div class="container-fluid px-4">
-        <h1 class="mt-4">Dashboard</h1>
+
+    <div class="container-fluid py-4">
+        <h1 class="mt-4">Dashboard {{ $curr_date }}</h1>
         <hr class="py-3">
-        <div class="row">
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card bg-warning shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-dark small mb-1">For Approval Loans</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $for_approval }}</div>
-                            </div>
-                            <i class="fa fa-hourglass-start fa-2x text-dark"></i>
+        <div class="row g-3">
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-primary text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">For Approval Loans</h6>
+                            <h3 class="fw-bold mb-0">{{ $for_approval }}</h3>
                         </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card bg-primary text-white shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white-75 small mb-1">Approved Requests</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $approved }}</div>
-                            </div>
-                            <i class="fa fa-check-circle fa-2x"></i>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-success text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Approved Requests</h6>
+                            <h3 class="fw-bold mb-0">{{ $approved }}</h3>
                         </div>
-                    </div>
-                </div>
-            </div> 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card bg-info text-white shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white-75 small mb-1">Active Loans</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $active }}</div>
-                            </div>
-                            <i class="fa fa-play-circle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div> 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card bg-danger text-white shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white-75 small mb-1">Denied Loans</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $denied }}</div>
-                            </div>
-                            <i class="fa fa-times-circle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div> 
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card bg-success text-white shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="text-white-75 small mb-1">Completed Loans</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $complete }}</div>
-                            </div>
-                            <i class="fa fa-check-double fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div> 
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card bg-primary text-white shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="mr-3">
-                                <div class="text-white-75 small">Pending Borrowers</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $pending }}</div>
-                            </div>
-                            <i class="fa fa-users"></i>
-                        </div>
+                        <i class="fas fa-thumbs-up fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card bg-primary text-white shadow h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="mr-3">
-                                <div class="text-white-75 small">Member Borrowers</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $curr_members }}</div>
-                            </div>
-                            <i class="fa fa-users"></i>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-info text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Active Loans</h6>
+                            <h3 class="fw-bold mb-0">{{ $active }}</h3>
                         </div>
+                        <i class="fas fa-hand-holding-usd fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-danger text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Denied Loans</h6>
+                            <h3 class="fw-bold mb-0">{{ $denied }}</h3>
+                        </div>
+                        <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-success text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Completed Loans</h6>
+                            <h3 class="fw-bold mb-0">{{ $complete }}</h3>
+                        </div>
+                        <i class="fas fa-clipboard-check fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-warning text-dark py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Pending Borrowers</h6>
+                            <h3 class="fw-bold mb-0">{{ $pending }}</h3>
+                        </div>
+                        <i class="fas fa-user-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-dark text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Member Borrowers</h6>
+                            <h3 class="fw-bold mb-0">{{ $curr_members }}</h3>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 bg-danger text-white py-3">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase fw-bold mb-2">Overdue Loans</h6>
+                            <h3 class="fw-bold mb-0">{{ $overdue }}</h3>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
