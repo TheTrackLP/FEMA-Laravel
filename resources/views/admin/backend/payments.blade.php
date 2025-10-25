@@ -79,10 +79,9 @@ $i = 1;
                     <h4 class="modal-title fw-bold text-success" id="modalPaymentLabel">
                         <i class="bi bi-credit-card me-2"></i> Payment Form
                     </h4>
-                    {{ $curr_date }}
+                    <h3>{{ $curr_date }}</h3>
                 </div>
                 <div class="modal-body">
-                    <!-- Loan selection -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Select Borrower & Plan</label>
                         <select name="loan_id" id="loan_id" class="form-select paymentSelect2 @error('loan_id')
@@ -101,12 +100,11 @@ $i = 1;
                         <div class="col-md-3">
                             <input type="hidden" name="plan_id" id="plan">
                             <input type="hidden" name="borrower_id" id="borrower">
-
-                            <div class="mb-3">
+                            <div class="form-group mb-3">
                                 <label class="form-label">Official Receipt #</label>
-                                <input type="number" name="off_rec" class="form-control @error('off_set')
+                                <input type="number" name="off_rec" class="form-control @error('off_rec')
                                 @enderror" placeholder="Enter OR number" required>
-                                @error('off_set')
+                                @error('off_rec')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
