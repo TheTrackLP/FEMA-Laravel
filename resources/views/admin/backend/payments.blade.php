@@ -73,33 +73,42 @@ $i = 1;
 <div class="modal fade" id="modalPayment" tabindex="-1" aria-labelledby="modalPaymentLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content border-0 shadow-lg rounded-3">
-            <form action="{{ route('pay.add') }}" method="POST">
+            <form action="{{ route('pay.add') }}" method="POST" id="myForm">
                 @csrf
                 <div class="modal-header bg-success bg-opacity-10 border-0">
                     <h4 class="modal-title fw-bold text-success" id="modalPaymentLabel">
                         <i class="bi bi-credit-card me-2"></i> Payment Form
                     </h4>
-                    <h3>{{ $curr_date }}</h3>
+                    {{ $curr_date }}
                 </div>
                 <div class="modal-body">
+                    <!-- Loan selection -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Select Borrower & Plan</label>
-                        <select name="loan_id" id="loan_id" class="form-select paymentSelect2" required>
+                        <select name="loan_id" id="loan_id" class="form-select paymentSelect2 @error('loan_id')
+                        @enderror" required>
                             <option value="">Choose a borrower...</option>
                             @foreach ($loans as $row)
                             <option value="{{ $row->id }}">{{ $row->borrow }} | {{ $row->plan }}</option>
                             @endforeach
                         </select>
+                        @error('loan_id')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <hr class="my-4">
                     <div class="row g-4">
                         <div class="col-md-3">
                             <input type="hidden" name="plan_id" id="plan">
                             <input type="hidden" name="borrower_id" id="borrower">
+
                             <div class="mb-3">
                                 <label class="form-label">Official Receipt #</label>
-                                <input type="number" name="off_rec" class="form-control" placeholder="Enter OR number"
-                                    required>
+                                <input type="number" name="off_rec" class="form-control @error('off_set')
+                                @enderror" placeholder="Enter OR number" required>
+                                @error('off_set')
+                                <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Remaining Balance</label>
@@ -113,15 +122,14 @@ $i = 1;
                         </div>
                         <div class="col-md-3">
                             <div class="row">
-                                <div class="col mb-3">
+                                <div class="form-group col mb-3">
                                     <label class="form-label">Principal</label>
-                                    <input type="text" name="paid" id="paid" class="form-control" placeholder="₱"
-                                        step="any">
+                                    <input type="number" name="paid" class="form-control" placeholder="₱" step="any">
                                 </div>
-                                <div class="col mb-3">
+                                <div class="form-group col mb-3">
                                     <label class="form-label">Interest</label>
-                                    <input type="number" name="interest" id="interest" class="form-control"
-                                        placeholder="₱" step="any">
+                                    <input type="number" name="interest" class="form-control" placeholder="₱"
+                                        step="any">
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -166,8 +174,58 @@ $i = 1;
         </div>
     </div>
 </div>
+<script type="text/javascript">
+$(document).ready(function() {
 
-<script>
+    $('#myForm').validate({
+        rules: {
+            loan_id: {
+                required: true,
+            },
+            off_rec: {
+                required: true,
+            },
+            paid: {
+                required: true,
+            },
+            interest: {
+                required: function() {
+                    if (day => 1 && day <= 15) {
+                        return true;
+                    } else {
+                        return false
+                    }
+                }
+            },
+        },
+        messages: {
+            loan_id: {
+                required: 'Please Select Borrower',
+            },
+            off_rec: {
+                required: 'Please Enter OR #',
+            },
+            paid: {
+                required: 'Please Enter Principal',
+            },
+            interest: {
+                required: 'Please Enter Interest',
+            },
+        },
+        errorElement: 'span',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+    });
+});
+
 const inputs = document.querySelectorAll('[name="paid"], [name="interest"], [name="penalty"]');
 inputs.forEach(input => {
     input.addEventListener('input', () => {
