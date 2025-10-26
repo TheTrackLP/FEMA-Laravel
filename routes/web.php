@@ -42,6 +42,7 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
         Route::post('/admin/loan-lists/applicant/store', 'AddApplication')->name('loans.store');
         Route::get('/admin/loan-lists/applicant/edit/{id}', 'loanListsEdit');
         Route::post('/admin/loan-lists/applicant/update', 'loanListsUpdate')->name('loans.update');
+        Route::get('/admin/loan-lists/timeline/{id}', 'LoanTimeline')->name('loans.timeline');
     });
 
     
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
         Route::get('/admin/payments', 'PaymentLists')->name('pay.list');
         Route::get('/admin/payments/getLoan/{id}', 'GetLoanData');
         Route::post('/admin/payments/add', 'AddPayment')->name('pay.add');
+        Route::get('/admin/print-receipt/{id}', 'PrintReceipt')->name('print.receipt');
     });
 
     Route::controller(LoanPlansController::class)->group(function(){
@@ -76,10 +78,6 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
         Route::get('/admin/accounts', 'AllACcounts')->name('accts');
         Route::get('/admin/accounts/info/{id}', 'GetAccountInfo');
         Route::post('/admin/accounts/update', 'AccountUpdate')->name('accts.update');
-    });
-
-    Route::controller(PrintController::class)->group(function(){
-    Route::get('/admin/print-receipt/{id}', 'PrintReceipt')->name('print.receipt');
     });
 });
 

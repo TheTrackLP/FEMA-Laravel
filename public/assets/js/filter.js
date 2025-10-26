@@ -23,12 +23,14 @@ $(document).ready(function () {
 
     var selectedBorrowerDept = $("#borrowerDept").val() || "";  
     var selectedBorrowerStatus = $("#borrowerStatus").val() || "";  
+    var selectedloanBorrower = $("#loanBorrower").val() || "";  
     var selectedloansPlans = $("#loansPlans").val() || "";  
     var selectedloansStatus = $("#loansStatus").val() || "";  
     var selectedPaymentPlans = $("#paymentPlans").val() || "";  
 
     var borrowerDept = data[4] || "";
     var borrowerStatus = data[5] || "";
+    var loanBorrower = data[2] || "";
     var loansPlans = data[2] || "";
     var loansStatus = data[5] || "";
     var paymentPlans = data[2] || "";
@@ -36,6 +38,7 @@ $(document).ready(function () {
     if (
       (selectedBorrowerDept === "" || borrowerDept.includes(selectedBorrowerDept)) &&
       (selectedBorrowerStatus === "" || borrowerStatus.includes(selectedBorrowerStatus)) &&
+      (selectedloanBorrower === "" || loanBorrower.includes(selectedloanBorrower)) &&
       (selectedloansPlans === "" || loansPlans.includes(selectedloansPlans)) &&
       (selectedloansStatus === "" || loansStatus.includes(selectedloansStatus)) &&
       (selectedPaymentPlans === "" || paymentPlans.includes(selectedPaymentPlans))
@@ -45,7 +48,7 @@ $(document).ready(function () {
     return false;
   });
 
-  $("#borrowerDept, #borrowerStatus, #loansPlans, #loansStatus, #paymentPlans").on("change", function(){
+  $("#borrowerDept, #borrowerStatus, #loansPlans, #loansStatus, #loanBorrower, #paymentPlans").on("change", function(){
     borrowersTable.draw();
     loansTable.draw();
     paymentsTable.draw();

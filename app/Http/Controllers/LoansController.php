@@ -160,4 +160,27 @@ class LoansController extends Controller
                             'alert-type' => 'success'
                          ]);    
     }
+
+    public function LoanTimeline($id){
+        $loan = DB::table('loan_lists')
+                ->select(
+                    'loan_lists.*',
+                    DB::raw("CONCAT(borrowers.lastname, ', ', borrowers.firstname, ' ', borrowers.lastname) as borrower"),
+                    DB::raw("CONCAT(loan_plans.plan_name) as plan"),
+                )
+                ->join('borrowers', 'loan_lists.borrower_id', '=', 'borrowers.id')
+                ->join('loan_plans', 'loan_lists.plan_id', '=', 'loan_plans.id')
+                ->where('loan_lists.id', $id)
+                ->first();
+$timeline = LoanSchedules::select(
+    'loan_schedules.*',
+    'payments.paid',
+    'payments.interest'
+)
+->join('payments', 'loan_schedules.loan_id', '=', 'payments.loan_id')
+->where('loan_schedules.loan_id', $id)
+->get();
+
+        return view('admin.backend.print.loan_timeline', compact('loan', 'timeline'));
+    }
 }

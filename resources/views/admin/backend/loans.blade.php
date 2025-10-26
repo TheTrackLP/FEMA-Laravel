@@ -16,6 +16,15 @@
         <div class="card-body">
             <div class="row mb-4">
                 <div class="col-md-4">
+                    <label for="">Borrower</label>
+                    <select name="" id="loanBorrower" class="form-select select2">
+                        <option value=""></option>
+                        @foreach ($borrowers as $borrow)
+                        <option value="{{ $borrow->borrower }}">{{ $borrow->borrower }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
                     <label for="">Type of Loan</label>
                     <select name="" id="loansPlans" class="form-select select2">
                         <option value=""></option>
@@ -58,6 +67,7 @@
                     $offset = App\Models\Payments::where('loan_id', $loan->id)->count();
                     $next = App\Models\LoanSchedules::select('date_due')->where('loan_id', $loan->id)
                     ->limit(1)->offset($offset)->get();
+                    $total_paid = App\Models\Payments::where('loan_id', $loan->id)->sum('paid');
                     $interest = ($loan->amount * $loan->interest_percentage/100);
                     $penalty = ($loan->amount * $loan->penalty_rate/100);
                     $curr_date = Carbon\Carbon::now();
@@ -70,8 +80,8 @@
                             <p>Plan: <b class="">{{ $loan->plan }}</b></p>
                         </td>
                         <td class="align-middle">
-                            <p>Capital: <b>{{ number_format($loan->shared_capital, 2) }}</b></p>
-                            <p>Balance: <b>{{ number_format($loan->amount, 2) }}</b></p>
+                            <p>Balance: <b>₱{{ number_format($total_paid, 2) }}</b></p>
+                            <p>Balance: <b>₱{{ number_format($loan->amount, 2) }}</b></p>
                         </td>
                         <td class="align-middle">
                             @if ($loan->status == 2)
@@ -84,13 +94,13 @@
                             $withInterest = Carbon\Carbon::parse($nextDate->date_due)->format('d')
                             @endphp
                             @if ($withInterest >= 1 && $withInterest <= 15) <p class="text-primary">Principal:
-                                <b>500.00</b></p>
+                                <b>₱500.00</b></p>
                                 @elseif ($withInterest >= 16 && $withInterest <= 31) <p class="text-primary">Principal:
-                                    <b>500.00</b></p>
-                                    <p class="text-danger">Interest: <b>{{ number_format($interest, 2) }}</b></p>
+                                    <b>₱500.00</b></p>
+                                    <p class="text-danger">Interest: <b>₱{{ number_format($interest, 2) }}</b></p>
                                     @endif
                                     @if($curr_date >= $nextDate->date_due)
-                                    <p class="text-danger">Penalty: <b>{{ $penalty }}</b></p>
+                                    <p class="text-danger">Penalty: <b>₱{{ $penalty }}</b></p>
                                     @endif
                                     @else
                                     <p class="text-center">N/A</p>
@@ -112,6 +122,8 @@
                         <td class="text-center align-middle">
                             <button type="button" value="{{$loan->id}}" id="editApplicant"
                                 class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye"></i></button>
+                            <a type="button" href="{{ route('loans.timeline', $loan->id)  }}"
+                                class="btn btn-outline-success btn-sm"><i class="fa-solid fa-book"></i></a>
                             <button type="button" class="btn btn-outline-danger btn-sm"><i
                                     class="fa-solid fa-trash-can"></i></button>
                         </td>

@@ -105,7 +105,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="">Status</label>
-                            <select name="status" id="status" class="appliSelect2">
+                            <select name="status" id="status" class="editSelect2">
                                 <option value="0">New Applicant</option>
                                 <option value="1">Existing Member</option>
                             </select>
@@ -263,7 +263,7 @@ $(document).ready(function() {
                 $("#emp_id").val(res.borrower.emp_id);
                 $("#shared_capital").val(res.borrower.shared_capital);
                 $("#dept_id").val(res.borrower.dept_id).trigger("change");
-                $("#status").val(res.borrower.status);
+                $("#status").val(res.borrower.status).trigger("change");
                 $("#id").val(borrower_id);
             }
         });
