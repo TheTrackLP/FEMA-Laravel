@@ -60,8 +60,8 @@ $i = 1;
                     <td class="text-center align-middle">{{ number_format($payee->penalty, 2) }}</td>
                     <td class="text-center align-middle">{{ date('M d, Y', strtotime($payee->created_at)) }}</td>
                     <td class="text-center align-middle">
-                        <button class="btn btn-outline-success btn-sm"><i class="fa-solid fa-print"></i></button>
-                        <button class="btn btn-outline-success btn-sm"><i class="fa-solid fa-file"></i></button>
+                        <a class="btn btn-outline-success btn-sm" href="{{ route('print.receipt', $payee->id) }}"><i
+                                class="fa-solid fa-print"></i></a>
                     </td>
                 </tr>
                 @endforeach

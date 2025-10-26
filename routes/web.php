@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BorrowersController;
@@ -75,6 +76,10 @@ Route::middleware(['auth', 'roles:admin'])->group(function() {
         Route::get('/admin/accounts', 'AllACcounts')->name('accts');
         Route::get('/admin/accounts/info/{id}', 'GetAccountInfo');
         Route::post('/admin/accounts/update', 'AccountUpdate')->name('accts.update');
+    });
+
+    Route::controller(PrintController::class)->group(function(){
+    Route::get('/admin/print-receipt/{id}', 'PrintReceipt')->name('print.receipt');
     });
 });
 
