@@ -10,6 +10,7 @@ use App\Models\LoanPlans;
 use Carbon\carbon;
 use App\Models\LoanLists;
 use App\Models\LoanSchedules;
+use App\Models\Payments;
 
 class LoansController extends Controller
 {
@@ -172,15 +173,15 @@ class LoansController extends Controller
                 ->join('loan_plans', 'loan_lists.plan_id', '=', 'loan_plans.id')
                 ->where('loan_lists.id', $id)
                 ->first();
-$timeline = LoanSchedules::select(
-    'loan_schedules.*',
-    'payments.paid',
-    'payments.interest'
-)
-->join('payments', 'loan_schedules.loan_id', '=', 'payments.loan_id')
-->where('loan_schedules.loan_id', $id)
-->get();
+        $timeline = LoanSchedules::select(
+            'loan_schedules.*',
+        )
+        ->join('loan_lists', 'loan_schedules.loan_id', '=', 'loan_lists.id')
+        ->where('loan_schedules.loan_id', $id)
+        ->get();
 
-        return view('admin.backend.print.loan_timeline', compact('loan', 'timeline'));
+        $payment_timeline = Payments::select('loan_id', $id)->count();
+
+        return view('admin.backend.print.loan_timeline', compact('loan', 'timeline', 'payment_timeline'));
     }
 }

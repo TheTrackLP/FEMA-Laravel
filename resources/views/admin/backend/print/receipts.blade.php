@@ -117,6 +117,7 @@ $grand_total = $payee->paid + $payee->interest + $payee->capital + $payee->penal
             <p class="text-muted">Thank you for your payment.</p>
         </div>
         <div class="text-center mt-4 no-print">
+            <a class="btn btn-danger" href="{{ url()->previous() }}">Back</a>
             <button class="btn btn-primary" onclick="window.print()">🖨️ Print Receipt</button>
         </div>
     </div>
