@@ -180,8 +180,10 @@ class LoansController extends Controller
         ->where('loan_schedules.loan_id', $id)
         ->get();
 
-        $payment_timeline = Payments::select('loan_id', $id)->count();
+        $payment_timeline = Payments::where('loan_id', $id)->count();
 
-        return view('admin.backend.print.loan_timeline', compact('loan', 'timeline', 'payment_timeline'));
+        $totalPaid = 500 * $payment_timeline;
+
+        return view('admin.backend.print.loan_timeline', compact('loan', 'timeline', 'payment_timeline', 'totalPaid'));
     }
 }

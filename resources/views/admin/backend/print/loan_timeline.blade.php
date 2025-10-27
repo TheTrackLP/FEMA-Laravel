@@ -66,6 +66,20 @@ $i = 1;
                             </tr>
                             @endforeach
                         </tbody>
+                        <tfoot class="table-light text-center">
+                            <tr>
+                                <th colspan="2">Original Loan Amount</th>
+                                <th colspan="2">₱{{ number_format($loan->amount_borrow, 2) }}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="2">Total Principal Paid</th>
+                                <th colspan="2">₱{{ number_format($totalPaid, 2) }}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="2">Remaining Loan Balance</th>
+                                <th colspan="2">₱{{ number_format($loan->amount, 2) }}</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

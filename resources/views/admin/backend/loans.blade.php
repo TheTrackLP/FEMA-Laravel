@@ -80,8 +80,8 @@
                             <p>Plan: <b class="">{{ $loan->plan }}</b></p>
                         </td>
                         <td class="align-middle">
-                            <p>Balance: <b>₱{{ number_format($total_paid, 2) }}</b></p>
-                            <p>Balance: <b>₱{{ number_format($loan->amount, 2) }}</b></p>
+                            <p>Total Paid: <b>₱{{ number_format($total_paid, 2) }}</b></p>
+                            <p>Remaining: <b>₱{{ number_format($loan->amount, 2) }}</b></p>
                         </td>
                         <td class="align-middle">
                             @if ($loan->status == 2)
