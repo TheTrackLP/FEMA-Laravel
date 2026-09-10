@@ -22,6 +22,7 @@ class BorrowersController extends Controller
     }
 
     public function BorrowerStore(Request $request){
+        $currDate = date('currDate');
         $valid = Validator::make($request->all(), [
             'fullname' => 'required',
             'datebirth' => 'required',
@@ -48,6 +49,7 @@ class BorrowersController extends Controller
             'sharedcapital' => $request->sharedcapital,
             'deptid' => $request->deptid,
             'yearservice' => $request->yearservice,
+            'appliedat' => $currDate,
         ]);
 
         return redirect()->route('borrow.dash')->with(
@@ -56,6 +58,7 @@ class BorrowersController extends Controller
     }
 
     public function BorrowerUpdate(Request $request){
+        $currDate = date('Y-m-d');
         $valid = Validator::make($request->all(), [
             'fullname' => 'required',
             'datebirth' => 'required',
@@ -82,11 +85,30 @@ class BorrowersController extends Controller
             'sharedcapital' => $request->sharedcapital,
             'deptid' => $request->deptid,
             'yearservice' => $request->yearservice,
-            'appliedat' => $request->yearservice,
+            'datejoined' => $currDate,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('borrow.dash')->with(
             'success', 'Success, Borrower Updated',
+        );
+    }
+
+    public function BorrowerStatus($id){
+        $borrowStat = Borrowers::findorfail($id);
+
+        if($borrowStat->status == 1){
+            $borrowStat->update([
+                'status' => 2,
+            ]);
+        } else if($borrowStat->status == 2){
+            $borrowStat->update([
+                'status' => 1,
+            ]);
+        }
+
+        return redirect()->route('borrow.dash')->with(
+            'success', 'Success, Borrower Status Changed',
         );
     }
 }

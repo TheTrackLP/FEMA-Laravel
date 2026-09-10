@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function(){
         Route::get('/admin/borrowers', 'BorrowerDashboard')->name('borrow.dash');
         Route::post('/admin/borrowers/store', 'BorrowerStore')->name('borrow.store');
         Route::post('/admin/borrowers/store/{id}', 'BorrowerUpdate')->name('borrow.update');
+        Route::post('/admin/borrowers/status/{id}', 'BorrowerStatus')->name('borrow.status');
     });
 
     Route::controller(DepartmentController::class)->group(function(){

@@ -1,8 +1,8 @@
 <script setup>
-import { nextTick, ref } from "vue";
-import { useForm } from "@inertiajs/vue3";
+import { nextTick, ref, computed } from "vue";
+import { Head, useForm } from "@inertiajs/vue3";
 import { Modal } from "bootstrap";
-import { currencyFormat } from "@/GlobalReuse/currencyFormat";
+import { currencyFormat, formatDate } from "@/reuseables";
 
 const statushide = ref(false);
 
@@ -38,7 +38,21 @@ const borrowerForm = useForm({
     status: "",
 });
 
-const fetchBorrower = () => {};
+const fetchBorrower = (borrow) => {
+    openModal();
+    borrowerFormMode.value = "edit";
+    statushide.value = true;
+    borrowerForm.id = borrow.id;
+    borrowerForm.fullname = borrow.fullname;
+    borrowerForm.datebirth = borrow.datebirth;
+    borrowerForm.contact = borrow.contact;
+    borrowerForm.address = borrow.address;
+    borrowerForm.empid = borrow.empid;
+    borrowerForm.sharedcapital = borrow.sharedcapital;
+    borrowerForm.deptid = borrow.deptid;
+    borrowerForm.yearservice = borrow.yearservice;
+    borrowerForm.status = borrow.status;
+};
 
 const borrowerFormSubmit = () => {
     if (borrowerFormMode.value === "create") {
@@ -60,6 +74,32 @@ const borrowerFormSubmit = () => {
     }
 };
 
+const changeBorrowerStatus = (borrow) => {
+    borrowerForm.post(route("borrow.status", borrow.id));
+};
+
+const accordionOpen = ref(false);
+
+const selectedName = ref("");
+const selectedDept = ref("");
+const selectedStatus = ref("");
+
+const filteredLoans = computed(() => {
+    const filterName = selectedName.value.toLowerCase().trim();
+    const filterDept = selectedDept.value;
+    const filterStatus = selectedStatus.value;
+
+    return props.borrows.filter((borrow) => {
+        const matchName =
+            !filterName || borrow.fullname.toLowerCase().includes(filterName);
+        const matchDept = !filterDept || borrow.deptid === filterDept;
+        const matchStatus =
+            filterStatus === "" ||
+            Number(borrow.status) === Number(filterStatus);
+        return matchName && matchDept && matchStatus;
+    });
+});
+
 const props = defineProps({
     depts: Array,
     borrows: Array,
@@ -75,10 +115,17 @@ export default {
 </script>
 <style>
 .table-responsive {
-    border: 1px solid gray;
+    overflow: auto;
+    max-height: 730px;
+}
+.table-responsive th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 </style>
 <template>
+    <Head title="Borrowers" />
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="font-display mb-0" style="font-size: 2rem">
@@ -89,10 +136,61 @@ export default {
             <i class="fa-solid fa-plus"></i> New Borrower
         </button>
     </div>
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button
+                    class="accordion-button"
+                    :class="{ collapsed: !accordionOpen }"
+                    type="button"
+                    @click="accordionOpen = !accordionOpen"
+                >
+                    Filters <i class="fa-solid fa-filter"></i>
+                </button>
+            </h2>
+            <div v-if="accordionOpen" class="accordion-collapse">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <label for="">Search Name</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Search Borrower's Name"
+                                v-model="selectedName"
+                            />
+                        </div>
+                        <div class="col-lg-4">
+                            <label for="">Department</label>
+                            <v-select
+                                :options="depts"
+                                :reduce="(dept) => dept.id"
+                                label="name"
+                                placeholder="Select Department"
+                                v-model="selectedDept"
+                            ></v-select>
+                        </div>
+                        <div class="col-lg-4">
+                            <label for="">Status</label>
+                            <select
+                                v-model="selectedStatus"
+                                class="form-select"
+                            >
+                                <option value="">Select Status</option>
+                                <option :value="0">Pending</option>
+                                <option :value="1">Active</option>
+                                <option :value="2">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead class="table-info">
-                <tr>
+                <tr class="text-center">
                     <th>#</th>
                     <th>Employee ID</th>
                     <th>Borrower's Name</th>
@@ -103,34 +201,76 @@ export default {
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr v-for="(borrow, index) in borrows" :key="index">
+            <tbody v-if="filteredLoans.length > 0">
+                <tr
+                    v-for="(borrow, index) in filteredLoans"
+                    :key="index"
+                    class="text-center align-middle"
+                >
                     <td>{{ index + 1 }}</td>
                     <td>{{ borrow.empid }}</td>
-                    <td>{{ borrow.fullname }}</td>
+                    <td class="text-right">{{ borrow.fullname }}</td>
                     <td>{{ currencyFormat(borrow.sharedcapital) }}</td>
                     <td>{{ borrow.name }}</td>
                     <td>
                         <span
-                            class="badge text-bg-danger"
+                            class="badge text-bg-secondary"
                             v-if="borrow.status === 0"
-                            >New Applicant</span
+                            >Pending</span
                         >
                         <span
                             class="badge text-bg-success"
                             v-else-if="borrow.status === 1"
-                            >Exist Applicant</span
+                            >Active</span
+                        >
+                        <span
+                            class="badge text-bg-danger"
+                            v-else-if="borrow.status === 2"
+                            >Disabled</span
                         >
                     </td>
                     <td>
-                        {{ borrow.datebirth }}
+                        {{ formatDate(borrow.datejoined) }}
                     </td>
-                    <td>Action</td>
+                    <td class="text-center">
+                        <button
+                            class="btn btn-outline-warning"
+                            @click="fetchBorrower(borrow)"
+                        >
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button
+                            class="btn btn-outline-success"
+                            @click="changeBorrowerStatus(borrow)"
+                            v-if="borrow.status === 1"
+                        >
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </button>
+                        <button
+                            class="btn btn-outline-danger"
+                            @click="changeBorrowerStatus(borrow)"
+                            v-else-if="borrow.status === 2"
+                        >
+                            <i class="fa-solid fa-circle-minus"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody v-else>
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <h5 class="text-muted mb-0">No Data</h5>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div class="modal fade" ref="modalRef">
+    <div
+        class="modal fade"
+        ref="modalRef"
+        data-bs-keyboard="false"
+        data-bs-backdrop="static"
+    >
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -248,12 +388,9 @@ export default {
                                             <option value="">
                                                 Select Status
                                             </option>
-                                            <option value="0">
-                                                New Applicant
-                                            </option>
-                                            <option value="1">
-                                                Existing Applicant
-                                            </option>
+                                            <option value="0">Pending</option>
+                                            <option value="1">Active</option>
+                                            <option value="2">Disabled</option>
                                         </select>
                                     </div>
                                 </div>
