@@ -21,8 +21,8 @@ import { Link } from "@inertiajs/vue3";
             <Link :href="route('borrow.dash')" class="nav-link"
                 ><i class="bi bi-file-earmark-text"></i> Borrowers</Link
             >
-            <a href="#" class="nav-link"
-                ><i class="bi bi-cash-stack"></i> Loans</a
+            <Link :href="route('loans.dash')" class="nav-link"
+                ><i class="fa-solid fa-users"></i> Loans</Link
             >
             <a href="#" class="nav-link"
                 ><i class="bi bi-credit-card"></i> Payments</a

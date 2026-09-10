@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BorrowersController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\LoansController;
 use App\Http\Controllers\LoanTypesController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -23,6 +24,10 @@ Route::middleware('auth')->group(function(){
         Route::post('/admin/borrowers/store', 'BorrowerStore')->name('borrow.store');
         Route::post('/admin/borrowers/store/{id}', 'BorrowerUpdate')->name('borrow.update');
         Route::post('/admin/borrowers/status/{id}', 'BorrowerStatus')->name('borrow.status');
+    });
+
+    Route::controller(LoansController::class)->group(function(){
+        Route::get('/admin/loans', 'LoansDashboard')->name('loans.dash');
     });
 
     Route::controller(DepartmentController::class)->group(function(){
