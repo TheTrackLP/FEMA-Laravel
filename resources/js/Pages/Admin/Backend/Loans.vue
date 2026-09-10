@@ -23,6 +23,18 @@ const openModal = () => {
 const openLoanModalForm = () => {
     openModal();
 };
+
+const selectedBorrower = ref("");
+const fetchBorrower = computed(() => {
+    if (!selectedBorrower.value) return;
+    return props.borrowers.find(
+        (borrow) => borrow.id === selectedBorrower.value,
+    );
+});
+
+const props = defineProps({
+    borrowers: Array,
+});
 </script>
 
 <script>
@@ -220,41 +232,24 @@ export default {
                                                 >*</span
                                             >
                                         </label>
-                                        <select
-                                            class="form-select"
-                                            id="borrowerSelect"
-                                            required
-                                        >
-                                            <option value="" selected disabled>
-                                                Select an option
-                                            </option>
-                                            <option value="1">
-                                                Juan Dela Cruz
-                                            </option>
-                                            <option value="2">
-                                                Maria Santos
-                                            </option>
-                                            <option value="3">
-                                                Pedro Reyes
-                                            </option>
-                                        </select>
+                                        <v-select
+                                            :options="borrowers"
+                                            :reduce="(borrow) => borrow.id"
+                                            label="fullname"
+                                            placeholder="Select Borrower"
+                                            v-model="selectedBorrower"
+                                        ></v-select>
                                     </div>
-                                    <div class="borrower-info-box mb-4">
+                                    <div
+                                        class="borrower-info-box mb-4"
+                                        v-if="fetchBorrower"
+                                    >
                                         <div
                                             class="d-flex justify-content-between align-items-center mb-3"
                                         >
                                             <span class="section-label"
                                                 >Borrower Information</span
                                             >
-                                            <span
-                                                class="badge badge-eligible"
-                                                id="eligibilityBadge"
-                                            >
-                                                <i
-                                                    class="bi bi-check-circle-fill me-1"
-                                                ></i
-                                                >Eligible
-                                            </span>
                                         </div>
                                         <div class="row g-3">
                                             <div class="col-md-4 col-6">
@@ -265,9 +260,12 @@ export default {
                                                 <input
                                                     type="text"
                                                     class="form-control readonly-field"
-                                                    id="fieldSharedCapital"
-                                                    value="₱25,000.00"
                                                     readonly
+                                                    :value="
+                                                        currencyFormat(
+                                                            fetchBorrower.sharedcapital,
+                                                        )
+                                                    "
                                                     tabindex="-1"
                                                 />
                                             </div>
@@ -279,10 +277,32 @@ export default {
                                                 <input
                                                     type="text"
                                                     class="form-control readonly-field"
-                                                    id="fieldYearsOfService"
-                                                    value="3 years"
+                                                    value="1-4 years"
                                                     readonly
-                                                    tabindex="-1"
+                                                    v-if="
+                                                        fetchBorrower.yearservice ===
+                                                        1
+                                                    "
+                                                />
+                                                <input
+                                                    type="text"
+                                                    class="form-control readonly-field"
+                                                    value="5-9 years"
+                                                    readonly
+                                                    v-else-if="
+                                                        fetchBorrower.yearservice ===
+                                                        2
+                                                    "
+                                                />
+                                                <input
+                                                    type="text"
+                                                    class="form-control readonly-field"
+                                                    value="10-Above years"
+                                                    readonly
+                                                    v-if="
+                                                        fetchBorrower.yearservice ===
+                                                        3
+                                                    "
                                                 />
                                             </div>
                                             <div class="col-md-4 col-6">
@@ -294,7 +314,11 @@ export default {
                                                     type="text"
                                                     class="form-control readonly-field"
                                                     id="fieldDateJoined"
-                                                    value="Jan 14, 2023"
+                                                    :value="
+                                                        formatDate(
+                                                            fetchBorrower.datejoined,
+                                                        )
+                                                    "
                                                     readonly
                                                     tabindex="-1"
                                                 />

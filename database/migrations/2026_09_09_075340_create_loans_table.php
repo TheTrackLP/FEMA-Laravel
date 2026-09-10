@@ -21,6 +21,8 @@ return new class extends Migration
             $table->decimal('amountborrowed');
             $table->tinyInteger('status')->default(0);
             $table->dateTime('date_released');
+            $table->date('appliedate');
+            $table->date('datejoined');
             $table->timestamps();
         });
     }
