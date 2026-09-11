@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function(){
 
     Route::controller(LoansController::class)->group(function(){
         Route::get('/admin/loans', 'LoansDashboard')->name('loans.dash');
+        Route::post('/admin/loans/store', 'LoansAppliStore')->name('loans.store');
+        Route::post('/admin/loans/update/{id}', 'LoansAppliUpdate')->name('loans.update');
     });
 
     Route::controller(DepartmentController::class)->group(function(){

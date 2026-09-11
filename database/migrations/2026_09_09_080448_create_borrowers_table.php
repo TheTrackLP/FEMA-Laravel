@@ -22,6 +22,8 @@ return new class extends Migration
             $table->integer('deptid');
             $table->integer('yearservice');
             $table->integer('status')->default(0);
+            $table->date('appliedate');
+            $table->date('datejoined');
             $table->timestamps();
         });
     }

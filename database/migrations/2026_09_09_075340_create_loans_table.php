@@ -13,16 +13,15 @@ return new class extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
-            $table->string('refno');
+            $table->string('refno')->nullable();
             $table->integer('borrower_id');
             $table->integer('loantype_id');
             $table->text('purpose');
             $table->decimal('currbalance');
             $table->decimal('amountborrowed');
             $table->tinyInteger('status')->default(0);
-            $table->dateTime('date_released');
-            $table->date('appliedate');
-            $table->date('datejoined');
+            $table->dateTime('date_approved')->nullable();
+            $table->dateTime('date_released')->nullable();
             $table->timestamps();
         });
     }

@@ -5,10 +5,15 @@ import { Modal } from "bootstrap";
 import { currencyFormat, formatDate } from "@/reuseables";
 
 const accordionOpen = ref(false);
+const accordionOpenLoan = ref(false);
 
 const loanFormMode = ref("create");
 const loanForm = useForm({
     borrower_id: "",
+    loantype_id: "",
+    amountborrowed: "",
+    purpose: "",
+    status: "",
 });
 
 const modalRef = ref(null);
@@ -22,18 +27,47 @@ const openModal = () => {
 
 const openLoanModalForm = () => {
     openModal();
+    loanFormMode.value = "create";
 };
 
-const selectedBorrower = ref("");
+const fetctApplication = (loan) => {
+    loanFormMode.value = "edit";
+    loanForm.id = loan.id;
+    loanForm.borrower_id = loan.borrower_id;
+    loanForm.loantype_id = loan.loantype_id;
+    loanForm.amountborrowed = loan.amountborrowed;
+    loanForm.purpose = loan.purpose;
+    loanForm.status = loan.status;
+    openModal();
+};
+
 const fetchBorrower = computed(() => {
-    if (!selectedBorrower.value) return;
-    return props.borrowers.find(
-        (borrow) => borrow.id === selectedBorrower.value,
-    );
+    if (!loanForm.borrower_id) return;
+    return props.borrowers.find((borrow) => borrow.id === loanForm.borrower_id);
 });
+
+const loanApplicationForm = () => {
+    if (loanFormMode.value === "create") {
+        loanFormMode.value = "create";
+        loanForm.post(route("loans.store"), {
+            onSuccess: () => {
+                loanForm.reset();
+            },
+        });
+    } else {
+        loanFormMode.value = "edit";
+        loanForm.post(route("loans.update", loanForm.id), {
+            onSuccess: () => {
+                loanForm.reset();
+            },
+        });
+    }
+};
 
 const props = defineProps({
     borrowers: Array,
+    types: Array,
+    loans: Array,
 });
 </script>
 
@@ -94,7 +128,7 @@ export default {
 }
 </style>
 <template>
-    <Head title="Borrowers" />
+    <Head title="Loans" />
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="font-display mb-0" style="font-size: 2rem">
@@ -161,38 +195,80 @@ export default {
             <thead class="table-info">
                 <tr class="text-center">
                     <th>#</th>
-                    <th>Employee ID</th>
-                    <th>Borrower's Name</th>
-                    <th>Shared Capital</th>
-                    <th>Department</th>
+                    <th>Reference</th>
+                    <th>Borrower's Details</th>
+                    <th>Amount Details</th>
+                    <th>Next Payment Details</th>
                     <th>Status</th>
-                    <th>Date Joined</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr class="text-center align-middle">
-                    <td></td>
-                    <td>qqwe</td>
-                    <td class="text-right">Nmae</td>
-                    <td>Capital</td>
+                <tr
+                    class="text-center align-middle"
+                    v-for="(loan, index) in loans"
+                    :key="index"
+                >
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ loan.refno }}</td>
+                    <td class="text-start">
+                        <p>
+                            Name: <strong>{{ loan.fullname }}</strong>
+                        </p>
+                        <p>
+                            Plan: <strong>{{ loan.plan }}</strong>
+                        </p>
+                    </td>
+                    <td class="text-start">
+                        <p>
+                            Total Paid: <strong>{{ loan.fullname }}</strong>
+                        </p>
+                        <p>
+                            Remaining Balance: <strong>{{ loan.plan }}</strong>
+                        </p>
+                    </td>
                     <td>Name</td>
                     <td>
-                        <span class="badge text-bg-secondary">Pending</span>
-                        <span class="badge text-bg-success">Active</span>
-                        <span class="badge text-bg-danger">Disabled</span>
+                        <span
+                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
+                            v-if="loan.status === 0"
+                            >Pending</span
+                        >
+                        <span
+                            class="badge bg-info-subtle text-info border border-info-subtle"
+                            v-else-if="loan.status === 1"
+                            >Approved</span
+                        >
+                        <span
+                            class="badge bg-primary-subtle text-primary border border-primary-subtle"
+                            v-else-if="loan.status === 2"
+                            >Released</span
+                        >
+                        <span
+                            class="badge bg-success-subtle text-success border border-success-subtle"
+                            v-else-if="loan.status === 3"
+                            >Active</span
+                        >
+                        <span
+                            class="badge bg-danger-subtle text-danger border border-danger-subtle"
+                            v-else-if="loan.status === 4"
+                            >Denied</span
+                        >
                     </td>
-                    <td></td>
                     <td class="text-center">
-                        <button class="btn btn-outline-warning">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="btn btn-outline-success">
-                            <i class="fa-solid fa-circle-plus"></i>
-                        </button>
-                        <button class="btn btn-outline-danger">
-                            <i class="fa-solid fa-circle-minus"></i>
-                        </button>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button class="btn btn-sm btn-outline-secondary">
+                                View
+                            </button>
+                            <template v-if="loan.status === 0">
+                                <button
+                                    class="btn btn-sm btn-outline-secondary"
+                                    @click="fetctApplication(loan)"
+                                >
+                                    Edit
+                                </button>
+                            </template>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -207,21 +283,21 @@ export default {
     >
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Loan Application Form</h5>
-                    <button
-                        type="button"
-                        class="btn-close btn-close-white-custom"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                    ></button>
-                </div>
-
-                <div class="modal-body p-0">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="p-4 modal-body-scroll">
-                                <form id="loanApplicationForm" novalidate>
+                <form @submit.prevent="loanApplicationForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Loan Application Form</h5>
+                        <input type="text" v-model="loanForm.id" />
+                        <button
+                            type="button"
+                            class="btn-close btn-close-white-custom"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="row g-0">
+                            <div class="col-md-8">
+                                <div class="p-4 modal-body-scroll">
                                     <div class="mb-4">
                                         <label
                                             for="borrowerSelect"
@@ -237,7 +313,7 @@ export default {
                                             :reduce="(borrow) => borrow.id"
                                             label="fullname"
                                             placeholder="Select Borrower"
-                                            v-model="selectedBorrower"
+                                            v-model="loanForm.borrower_id"
                                         ></v-select>
                                     </div>
                                     <div
@@ -313,7 +389,6 @@ export default {
                                                 <input
                                                     type="text"
                                                     class="form-control readonly-field"
-                                                    id="fieldDateJoined"
                                                     :value="
                                                         formatDate(
                                                             fetchBorrower.datejoined,
@@ -332,7 +407,7 @@ export default {
                                     </div>
 
                                     <div class="row g-3 mb-3">
-                                        <div class="col-md-6">
+                                        <div class="col-md-7">
                                             <label
                                                 for="loanPlan"
                                                 class="form-label fw-semibold"
@@ -342,31 +417,23 @@ export default {
                                                     >*</span
                                                 >
                                             </label>
-                                            <select
-                                                class="form-select"
-                                                id="loanPlan"
-                                                required
+                                            <v-select
+                                                :options="types"
+                                                :reduce="(type) => type.id"
+                                                label="name"
+                                                placeholder="Select Loan Type"
+                                                v-model="loanForm.loantype_id"
                                             >
-                                                <option
-                                                    value=""
-                                                    selected
-                                                    disabled
-                                                >
-                                                    Select an option
-                                                </option>
-                                                <option value="1">
-                                                    Plan A [2% interest, 1%
-                                                    penalty]
-                                                </option>
-                                                <option value="2">
-                                                    Plan B [3% interest, 1.5%
-                                                    penalty]
-                                                </option>
-                                                <option value="3">
-                                                    Plan C [5% interest, 2%
-                                                    penalty]
-                                                </option>
-                                            </select>
+                                                <template #option="type">
+                                                    <span
+                                                        >{{ type.name }} [{{
+                                                            type.interest_rate
+                                                        }}% interest,
+                                                        {{ type.penalty }}%
+                                                        penalty]</span
+                                                    >
+                                                </template></v-select
+                                            >
                                             <div class="mt-1">
                                                 <small
                                                     >Plan [interest%,
@@ -375,7 +442,7 @@ export default {
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-5">
                                             <label
                                                 for="amountBorrowed"
                                                 class="form-label fw-semibold"
@@ -392,11 +459,13 @@ export default {
                                                 <input
                                                     type="number"
                                                     class="form-control"
-                                                    id="amountBorrowed"
                                                     placeholder="0.00"
                                                     min="0"
                                                     step="0.01"
                                                     required
+                                                    v-model="
+                                                        loanForm.amountborrowed
+                                                    "
                                                 />
                                             </div>
                                             <div class="mt-1">
@@ -409,7 +478,6 @@ export default {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="mb-3">
                                         <label
                                             for="purpose"
@@ -418,124 +486,155 @@ export default {
                                         >
                                         <textarea
                                             class="form-control"
-                                            id="purpose"
                                             rows="4"
                                             placeholder="Briefly describe the purpose of the loan"
+                                            v-model="loanForm.purpose"
                                         ></textarea>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="active-loans-panel">
-                                <div
-                                    class="d-flex justify-content-between align-items-center mb-3"
-                                >
-                                    <span class="panel-title"
-                                        >Active Loans</span
-                                    >
-                                    <span
-                                        class="badge bg-secondary"
-                                        id="activeLoanBadgeCount"
-                                        >1</span
-                                    >
-                                </div>
-                                <div
-                                    class="accordion accordion-flush"
-                                    id="accordionFlushExample"
-                                >
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <div
-                                                class="d-flex justify-content-between align-items-center"
-                                            ></div>
-                                            <button
-                                                class="accordion-button collapsed"
-                                                type="button"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#flush-collapseOne"
-                                            >
-                                                <div>
-                                                    <div class="fw-semibold">
-                                                        Loan #LN-1042
-                                                    </div>
-                                                    <div class="helper-text">
-                                                        Plan B &middot;
-                                                        ₱15,000.00
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-2">
-                                                    <span
-                                                        class="badge bg-success-subtle text-success border border-success-subtle"
-                                                        >Current</span
-                                                    >
-                                                </div>
-                                            </button>
-                                        </h2>
-                                        <div
-                                            id="flush-collapseOne"
-                                            class="accordion-collapse collapse"
-                                            data-bs-parent="#accordionFlushExample"
+                                    <div class="mb-3">
+                                        <label
+                                            for="status"
+                                            class="form-label fw-semibold"
+                                            >Status</label
                                         >
-                                            <div class="accordion-body">
-                                                <li
-                                                    class="list-group-item d-flex justify-content-between align-items-center"
+                                        <select
+                                            class="form-select"
+                                            v-model="loanForm.status"
+                                        >
+                                            <option value="0">Pending</option>
+                                            <option value="1">Approved</option>
+                                            <option value="2">Active</option>
+                                            <option value="3">Complete</option>
+                                            <option value="4">Denied</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="active-loans-panel">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3"
+                                    >
+                                        <span class="panel-title"
+                                            >Active Loans</span
+                                        >
+                                        <span
+                                            class="badge bg-secondary"
+                                            id="activeLoanBadgeCount"
+                                            >1</span
+                                        >
+                                    </div>
+                                    <div
+                                        class="accordion accordion-flush"
+                                        id="accordionFlushExample"
+                                    >
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <div
+                                                    class="d-flex justify-content-between align-items-center"
+                                                ></div>
+                                                <button
+                                                    class="accordion-button collapsed"
+                                                    type="button"
+                                                    :class="{
+                                                        collapsed:
+                                                            !accordionOpenLoan,
+                                                    }"
+                                                    @click="
+                                                        accordionOpenLoan =
+                                                            !accordionOpenLoan
+                                                    "
                                                 >
-                                                    Remaining Balance
-                                                    <span>₱9,200.00</span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex justify-content-between align-items-center"
-                                                >
-                                                    Amount Paid
-                                                    <span>₱5,800.00</span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex justify-content-between align-items-center"
-                                                >
-                                                    Next Due Date
-                                                    <span>Oct 5, 2026</span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex justify-content-between align-items-center"
-                                                >
-                                                    Interest / Penalty
-                                                    <span>3% / 1.5%</span>
-                                                </li>
+                                                    <div>
+                                                        <div
+                                                            class="fw-semibold"
+                                                        >
+                                                            Loan #LN-1042
+                                                        </div>
+                                                        <div
+                                                            class="helper-text"
+                                                        >
+                                                            Plan B &middot;
+                                                            ₱15,000.00
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <span
+                                                            class="badge bg-success-subtle text-success border border-success-subtle"
+                                                            >Current</span
+                                                        >
+                                                    </div>
+                                                </button>
+                                            </h2>
+                                            <div
+                                                class="accordion-collapse"
+                                                v-if="accordionOpenLoan"
+                                            >
+                                                <div class="accordion-body">
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center"
+                                                    >
+                                                        Remaining Balance
+                                                        <span>₱9,200.00</span>
+                                                    </li>
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center"
+                                                    >
+                                                        Amount Paid
+                                                        <span>₱5,800.00</span>
+                                                    </li>
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center"
+                                                    >
+                                                        Next Due Date
+                                                        <span>Oct 5, 2026</span>
+                                                    </li>
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center"
+                                                    >
+                                                        Interest / Penalty
+                                                        <span>3% / 1.5%</span>
+                                                    </li>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div
-                                    class="no-active-loans d-none"
-                                    id="noActiveLoansState"
-                                >
-                                    <i
-                                        class="bi bi-inbox fs-3 d-block mb-2"
-                                    ></i>
-                                    No active loans for this borrower.
+                                    <div
+                                        class="no-active-loans d-none"
+                                        id="noActiveLoansState"
+                                    >
+                                        <i
+                                            class="bi bi-inbox fs-3 d-block mb-2"
+                                        ></i>
+                                        No active loans for this borrower.
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        form="loanApplicationForm"
-                        class="btn btn-save text-white"
-                    >
-                        Save
-                    </button>
-                </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-success text-white"
+                        >
+                            {{
+                                loanForm.processing
+                                    ? "Saving.."
+                                    : loanFormMode === "create"
+                                      ? "Add Application"
+                                      : "Save Changes"
+                            }}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
