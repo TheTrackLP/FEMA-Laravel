@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Validator;
 
 class BorrowersController extends Controller
 {
+    private function StatusMessage(string $message, bool $success = true)
+    {
+        return redirect()->route('borrow.dash')->with($success ? 'success' : 'error', $message);
+    }
     public function BorrowerDashboard(){
         return inertia('Admin/Backend/Borrowers', [
             'depts'=>Departments::all(),
@@ -35,9 +39,7 @@ class BorrowersController extends Controller
         ]);
 
         if($valid->fails()){
-            return redirect()->route('borrow.dash')->with(
-                'error', 'Error, Try Again',
-            );
+            return $this->StatusMessage('Error, Try Again', false);
         }
 
         Borrowers::create([
@@ -52,9 +54,8 @@ class BorrowersController extends Controller
             'appliedat' => $currDate,
         ]);
 
-        return redirect()->route('borrow.dash')->with(
-            'success', 'Success, Borrower Added',
-        );
+        return $this->StatusMessage('Success, Borrower Updated', true);
+
     }
 
     public function BorrowerUpdate(Request $request){

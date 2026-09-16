@@ -5,7 +5,8 @@ import { Modal } from "bootstrap";
 import { currencyFormat, formatDate } from "@/reuseables";
 
 const accordionOpen = ref(false);
-const accordionOpenLoan = ref(false);
+const readonlyField = ref(true);
+const statusView = ref(false);
 
 const loanFormMode = ref("create");
 const loanForm = useForm({
@@ -25,9 +26,25 @@ const openModal = () => {
     });
 };
 
+const closeModal = () => {
+    modalInstance?.hide();
+};
+
+const modalView = ref(null);
+let modalInstanceView = null;
+const openModalView = () => {
+    nextTick(() => {
+        modalInstanceView = new Modal(modalView.value);
+        modalInstanceView.show();
+    });
+};
+
 const openLoanModalForm = () => {
     openModal();
     loanFormMode.value = "create";
+    readonlyField.value = false;
+    statusView.value = false;
+    loanForm.reset();
 };
 
 const fetctApplication = (loan) => {
@@ -38,7 +55,42 @@ const fetctApplication = (loan) => {
     loanForm.amountborrowed = loan.amountborrowed;
     loanForm.purpose = loan.purpose;
     loanForm.status = loan.status;
+    readonlyField.value = true;
+    statusView.value = true;
     openModal();
+};
+
+const getBorrowerName = ref("");
+const getSharedCap = ref("");
+const getYearService = ref("");
+const getYearJoined = ref("");
+const getPlanName = ref("");
+const getAmountBorrowed = ref("");
+const getCurrBalance = ref("");
+const getPurpose = ref("");
+const getRefNo = ref("");
+const getAppliedDate = ref("");
+const getApprovedDate = ref("");
+const getReleasedDate = ref("");
+const getCompletedDate = ref("");
+const getStatus = ref("");
+
+const viewLoanApplication = (loan) => {
+    openModalView();
+    getBorrowerName.value = loan.fullname;
+    getSharedCap.value = loan.sharedcapital;
+    getYearService.value = loan.yearservice;
+    getYearJoined.value = loan.datejoined;
+    getPlanName.value = loan.fullplan;
+    getAmountBorrowed.value = loan.amountborrowed;
+    getCurrBalance.value = loan.currbalance;
+    getPurpose.value = loan.purpose;
+    getRefNo.value = loan.refno;
+    getAppliedDate.value = loan.date_applied;
+    getApprovedDate.value = loan.date_approved;
+    getReleasedDate.value = loan.date_released;
+    getCompletedDate.value = loan.date_completed;
+    getStatus.value = loan.status;
 };
 
 const fetchBorrower = computed(() => {
@@ -52,6 +104,7 @@ const loanApplicationForm = () => {
         loanForm.post(route("loans.store"), {
             onSuccess: () => {
                 loanForm.reset();
+                closeModal();
             },
         });
     } else {
@@ -59,6 +112,7 @@ const loanApplicationForm = () => {
         loanForm.post(route("loans.update", loanForm.id), {
             onSuccess: () => {
                 loanForm.reset();
+                closeModal();
             },
         });
     }
@@ -117,6 +171,12 @@ export default {
     text-transform: uppercase;
     letter-spacing: 0.03em;
     color: #495057;
+}
+
+.purpose-text {
+    font-size: 1rem;
+    color: #343a40;
+    min-height: 100px;
 }
 
 @media (max-width: 767.98px) {
@@ -247,7 +307,7 @@ export default {
                         <span
                             class="badge bg-success-subtle text-success border border-success-subtle"
                             v-else-if="loan.status === 3"
-                            >Active</span
+                            >Released</span
                         >
                         <span
                             class="badge bg-danger-subtle text-danger border border-danger-subtle"
@@ -257,17 +317,20 @@ export default {
                     </td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
-                            <button class="btn btn-sm btn-outline-secondary">
-                                View
+                            <button
+                                class="btn btn-sm btn-outline-secondary"
+                                @click="viewLoanApplication(loan)"
+                            >
+                                <i class="fa-solid fa-eye"></i>
                             </button>
-                            <template v-if="loan.status === 0">
-                                <button
-                                    class="btn btn-sm btn-outline-secondary"
-                                    @click="fetctApplication(loan)"
-                                >
-                                    Edit
-                                </button>
-                            </template>
+
+                            <button
+                                v-if="loan.status === 0 || loan.status === 1"
+                                class="btn btn-sm btn-outline-primary"
+                                @click="fetctApplication(loan)"
+                            >
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -286,7 +349,7 @@ export default {
                 <form @submit.prevent="loanApplicationForm">
                     <div class="modal-header">
                         <h5 class="modal-title">Loan Application Form</h5>
-                        <input type="text" v-model="loanForm.id" />
+                        <input type="hidden" v-model="loanForm.id" />
                         <button
                             type="button"
                             class="btn-close btn-close-white-custom"
@@ -295,202 +358,166 @@ export default {
                         ></button>
                     </div>
                     <div class="modal-body p-0">
-                        <div class="row g-0">
-                            <div class="col-md-8">
-                                <div class="p-4 modal-body-scroll">
-                                    <div class="mb-4">
-                                        <label
-                                            for="borrowerSelect"
-                                            class="form-label fw-semibold"
-                                        >
-                                            Borrower
-                                            <span class="required-asterisk"
-                                                >*</span
-                                            >
-                                        </label>
-                                        <v-select
-                                            :options="borrowers"
-                                            :reduce="(borrow) => borrow.id"
-                                            label="fullname"
-                                            placeholder="Select Borrower"
-                                            v-model="loanForm.borrower_id"
-                                        ></v-select>
-                                    </div>
-                                    <div
-                                        class="borrower-info-box mb-4"
-                                        v-if="fetchBorrower"
+                        <div class="p-4 modal-body-scroll">
+                            <div class="mb-4">
+                                <label
+                                    for="borrowerSelect"
+                                    class="form-label fw-semibold"
+                                >
+                                    Borrower
+                                    <span class="required-asterisk">*</span>
+                                </label>
+                                <v-select
+                                    :options="borrowers"
+                                    :reduce="(borrow) => borrow.id"
+                                    label="fullname"
+                                    placeholder="Select Borrower"
+                                    v-model="loanForm.borrower_id"
+                                    :disabled="readonlyField"
+                                ></v-select>
+                            </div>
+                            <div
+                                class="borrower-info-box mb-4"
+                                v-if="fetchBorrower"
+                            >
+                                <div
+                                    class="d-flex justify-content-between align-items-center mb-3"
+                                >
+                                    <span class="section-label"
+                                        >Borrower Information</span
                                     >
-                                        <div
-                                            class="d-flex justify-content-between align-items-center mb-3"
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4 col-6">
+                                        <label class="form-label small mb-1"
+                                            >Shared Capital</label
                                         >
-                                            <span class="section-label"
-                                                >Borrower Information</span
-                                            >
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-4 col-6">
-                                                <label
-                                                    class="form-label small mb-1"
-                                                    >Shared Capital</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    class="form-control readonly-field"
-                                                    readonly
-                                                    :value="
-                                                        currencyFormat(
-                                                            fetchBorrower.sharedcapital,
-                                                        )
-                                                    "
-                                                    tabindex="-1"
-                                                />
-                                            </div>
-                                            <div class="col-md-4 col-6">
-                                                <label
-                                                    class="form-label small mb-1"
-                                                    >Years of Service</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    class="form-control readonly-field"
-                                                    value="1-4 years"
-                                                    readonly
-                                                    v-if="
-                                                        fetchBorrower.yearservice ===
-                                                        1
-                                                    "
-                                                />
-                                                <input
-                                                    type="text"
-                                                    class="form-control readonly-field"
-                                                    value="5-9 years"
-                                                    readonly
-                                                    v-else-if="
-                                                        fetchBorrower.yearservice ===
-                                                        2
-                                                    "
-                                                />
-                                                <input
-                                                    type="text"
-                                                    class="form-control readonly-field"
-                                                    value="10-Above years"
-                                                    readonly
-                                                    v-if="
-                                                        fetchBorrower.yearservice ===
-                                                        3
-                                                    "
-                                                />
-                                            </div>
-                                            <div class="col-md-4 col-6">
-                                                <label
-                                                    class="form-label small mb-1"
-                                                    >Date Joined</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    class="form-control readonly-field"
-                                                    :value="
-                                                        formatDate(
-                                                            fetchBorrower.datejoined,
-                                                        )
-                                                    "
-                                                    readonly
-                                                    tabindex="-1"
-                                                />
-                                            </div>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            class="form-control readonly-field"
+                                            readonly
+                                            :value="
+                                                currencyFormat(
+                                                    fetchBorrower.sharedcapital,
+                                                )
+                                            "
+                                            tabindex="-1"
+                                        />
                                     </div>
-                                    <div class="mb-2">
-                                        <span class="section-label"
-                                            >Loan Details</span
+                                    <div class="col-md-4 col-6">
+                                        <label class="form-label small mb-1"
+                                            >Years of Service</label
                                         >
+                                        <input
+                                            type="text"
+                                            class="form-control readonly-field"
+                                            value="1-4 years"
+                                            readonly
+                                            v-if="
+                                                fetchBorrower.yearservice === 1
+                                            "
+                                        />
+                                        <input
+                                            type="text"
+                                            class="form-control readonly-field"
+                                            value="5-9 years"
+                                            readonly
+                                            v-else-if="
+                                                fetchBorrower.yearservice === 2
+                                            "
+                                        />
+                                        <input
+                                            type="text"
+                                            class="form-control readonly-field"
+                                            value="10-Above years"
+                                            readonly
+                                            v-if="
+                                                fetchBorrower.yearservice === 3
+                                            "
+                                        />
                                     </div>
+                                    <div class="col-md-4 col-6">
+                                        <label class="form-label small mb-1"
+                                            >Date Joined</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control readonly-field"
+                                            :value="
+                                                formatDate(
+                                                    fetchBorrower.datejoined,
+                                                )
+                                            "
+                                            readonly
+                                            tabindex="-1"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="section-label">Loan Details</span>
+                            </div>
 
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-7">
-                                            <label
-                                                for="loanPlan"
-                                                class="form-label fw-semibold"
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label
+                                        for="loanPlan"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Loan Plan
+                                        <span class="required-asterisk">*</span>
+                                    </label>
+                                    <v-select
+                                        :options="types"
+                                        :reduce="(type) => type.id"
+                                        label="name"
+                                        placeholder="Select Loan Type"
+                                        v-model="loanForm.loantype_id"
+                                    >
+                                        <template #option="type">
+                                            <span
+                                                >{{ type.name }} [{{
+                                                    type.interest_rate
+                                                }}% interest,
+                                                {{ type.penalty }}%
+                                                penalty]</span
                                             >
-                                                Loan Plan
-                                                <span class="required-asterisk"
-                                                    >*</span
-                                                >
-                                            </label>
-                                            <v-select
-                                                :options="types"
-                                                :reduce="(type) => type.id"
-                                                label="name"
-                                                placeholder="Select Loan Type"
-                                                v-model="loanForm.loantype_id"
-                                            >
-                                                <template #option="type">
-                                                    <span
-                                                        >{{ type.name }} [{{
-                                                            type.interest_rate
-                                                        }}% interest,
-                                                        {{ type.penalty }}%
-                                                        penalty]</span
-                                                    >
-                                                </template></v-select
-                                            >
-                                            <div class="mt-1">
-                                                <small
-                                                    >Plan [interest%,
-                                                    Penalty%]</small
-                                                >
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-5">
-                                            <label
-                                                for="amountBorrowed"
-                                                class="form-label fw-semibold"
-                                            >
-                                                Amount Borrowed
-                                                <span class="required-asterisk"
-                                                    >*</span
-                                                >
-                                            </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"
-                                                    >₱</span
-                                                >
-                                                <input
-                                                    type="number"
-                                                    class="form-control"
-                                                    placeholder="0.00"
-                                                    min="0"
-                                                    step="0.01"
-                                                    required
-                                                    v-model="
-                                                        loanForm.amountborrowed
-                                                    "
-                                                />
-                                            </div>
-                                            <div class="mt-1">
-                                                <small>
-                                                    Max loanable:
-                                                    <strong
-                                                        >₱50,000.00</strong
-                                                    ></small
-                                                >
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label
-                                            for="purpose"
-                                            class="form-label fw-semibold"
-                                            >Purpose</label
+                                        </template></v-select
+                                    >
+                                    <div class="mt-1">
+                                        <small
+                                            >Plan [interest%, Penalty%]</small
                                         >
-                                        <textarea
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label
+                                        for="amountBorrowed"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Amount Borrowed
+                                        <span class="required-asterisk">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₱</span>
+                                        <input
+                                            type="number"
                                             class="form-control"
-                                            rows="4"
-                                            placeholder="Briefly describe the purpose of the loan"
-                                            v-model="loanForm.purpose"
-                                        ></textarea>
+                                            placeholder="0.00"
+                                            min="0"
+                                            step="0.01"
+                                            required
+                                            v-model="loanForm.amountborrowed"
+                                        />
                                     </div>
+                                    <div class="mt-1">
+                                        <small>
+                                            Max loanable:
+                                            <strong>₱50,000.00</strong></small
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-md-4" v-if="statusView">
                                     <div class="mb-3">
                                         <label
                                             for="status"
@@ -503,112 +530,25 @@ export default {
                                         >
                                             <option value="0">Pending</option>
                                             <option value="1">Approved</option>
-                                            <option value="2">Active</option>
+                                            <option value="2">Released</option>
                                             <option value="3">Complete</option>
                                             <option value="4">Denied</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="active-loans-panel">
-                                    <div
-                                        class="d-flex justify-content-between align-items-center mb-3"
-                                    >
-                                        <span class="panel-title"
-                                            >Active Loans</span
-                                        >
-                                        <span
-                                            class="badge bg-secondary"
-                                            id="activeLoanBadgeCount"
-                                            >1</span
-                                        >
-                                    </div>
-                                    <div
-                                        class="accordion accordion-flush"
-                                        id="accordionFlushExample"
-                                    >
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header">
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center"
-                                                ></div>
-                                                <button
-                                                    class="accordion-button collapsed"
-                                                    type="button"
-                                                    :class="{
-                                                        collapsed:
-                                                            !accordionOpenLoan,
-                                                    }"
-                                                    @click="
-                                                        accordionOpenLoan =
-                                                            !accordionOpenLoan
-                                                    "
-                                                >
-                                                    <div>
-                                                        <div
-                                                            class="fw-semibold"
-                                                        >
-                                                            Loan #LN-1042
-                                                        </div>
-                                                        <div
-                                                            class="helper-text"
-                                                        >
-                                                            Plan B &middot;
-                                                            ₱15,000.00
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex gap-2">
-                                                        <span
-                                                            class="badge bg-success-subtle text-success border border-success-subtle"
-                                                            >Current</span
-                                                        >
-                                                    </div>
-                                                </button>
-                                            </h2>
-                                            <div
-                                                class="accordion-collapse"
-                                                v-if="accordionOpenLoan"
-                                            >
-                                                <div class="accordion-body">
-                                                    <li
-                                                        class="list-group-item d-flex justify-content-between align-items-center"
-                                                    >
-                                                        Remaining Balance
-                                                        <span>₱9,200.00</span>
-                                                    </li>
-                                                    <li
-                                                        class="list-group-item d-flex justify-content-between align-items-center"
-                                                    >
-                                                        Amount Paid
-                                                        <span>₱5,800.00</span>
-                                                    </li>
-                                                    <li
-                                                        class="list-group-item d-flex justify-content-between align-items-center"
-                                                    >
-                                                        Next Due Date
-                                                        <span>Oct 5, 2026</span>
-                                                    </li>
-                                                    <li
-                                                        class="list-group-item d-flex justify-content-between align-items-center"
-                                                    >
-                                                        Interest / Penalty
-                                                        <span>3% / 1.5%</span>
-                                                    </li>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="no-active-loans d-none"
-                                        id="noActiveLoansState"
-                                    >
-                                        <i
-                                            class="bi bi-inbox fs-3 d-block mb-2"
-                                        ></i>
-                                        No active loans for this borrower.
-                                    </div>
-                                </div>
+                            <div class="mb-3">
+                                <label
+                                    for="purpose"
+                                    class="form-label fw-semibold"
+                                    >Purpose</label
+                                >
+                                <textarea
+                                    class="form-control"
+                                    rows="4"
+                                    placeholder="Briefly describe the purpose of the loan"
+                                    v-model="loanForm.purpose"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
@@ -617,7 +557,7 @@ export default {
                         <button
                             type="button"
                             class="btn btn-outline-secondary"
-                            data-bs-dismiss="modal"
+                            @click="closeModal"
                         >
                             Cancel
                         </button>
@@ -635,6 +575,211 @@ export default {
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" ref="modalView" tabindex="-1">
+        <div
+            class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
+        >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h4 class="modal-title mb-0">Loan Details</h4>
+                        <small class="">{{ getRefNo }}</small>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+                </div>
+
+                <div class="modal-body">
+                    <div
+                        class="d-flex justify-content-between align-items-center mb-3"
+                    >
+                        <span
+                            class="text-uppercase text-muted small fw-semibold"
+                            >Status</span
+                        >
+                        <span
+                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
+                            v-if="getStatus === 0"
+                            >Pending</span
+                        >
+                        <span
+                            class="badge bg-info-subtle text-info border border-info-subtle"
+                            v-else-if="getStatus === 1"
+                            >Approved</span
+                        >
+                        <span
+                            class="badge bg-primary-subtle text-primary border border-primary-subtle"
+                            v-else-if="getStatus === 2"
+                            >Released</span
+                        >
+                        <span
+                            class="badge bg-success-subtle text-success border border-success-subtle"
+                            v-else-if="getStatus === 3"
+                            >Released</span
+                        >
+                        <span
+                            class="badge bg-danger-subtle text-danger border border-danger-subtle"
+                            v-else-if="getStatus === 4"
+                            >Denied</span
+                        >
+                    </div>
+                    <div class="row text-center">
+                        <div class="col">
+                            <i
+                                class="bi bi-check-circle-fill text-success fs-5"
+                            ></i>
+                            <div class="small fw-semibold">Applied</div>
+                            <div class="small text-muted">
+                                {{
+                                    getAppliedDate
+                                        ? formatDate(getAppliedDate)
+                                        : "--"
+                                }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i
+                                class="bi bi-check-circle-fill text-success fs-5"
+                            ></i>
+                            <div class="small fw-semibold">Approved</div>
+                            <div class="small text-muted">
+                                {{
+                                    getApprovedDate
+                                        ? formatDate(getAppliedDate)
+                                        : "--"
+                                }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i class="bi bi-circle text-secondary fs-5"></i>
+                            <div class="small fw-semibold text-muted">
+                                Released
+                            </div>
+                            <div class="small text-muted">
+                                {{
+                                    getReleasedDate
+                                        ? formatDate(getAppliedDate)
+                                        : "--"
+                                }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <i class="bi bi-circle text-secondary fs-5"></i>
+                            <div class="small fw-semibold text-muted">
+                                Completed
+                            </div>
+                            <div class="small text-muted">
+                                {{
+                                    getCompletedDate
+                                        ? formatDate(getAppliedDate)
+                                        : "--"
+                                }}
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="my-5">
+                        <h6
+                            class="text-uppercase text-muted small fw-semibold mb-3"
+                        >
+                            Borrower Information
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3 col-6">
+                                <div class="small text-muted">Borrower</div>
+                                <div class="fw-semibold">
+                                    {{ getBorrowerName }}
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="small text-muted">
+                                    Shared Capital
+                                </div>
+                                <div class="fw-semibold">
+                                    {{ currencyFormat(getSharedCap) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="small text-muted">
+                                    Years of Service
+                                </div>
+                                <div
+                                    class="fw-semibold"
+                                    v-if="getYearService === 1"
+                                >
+                                    1-4 years
+                                </div>
+                                <div
+                                    class="fw-semibold"
+                                    v-else-if="getYearService === 2"
+                                >
+                                    5-9 years
+                                </div>
+                                <div
+                                    class="fw-semibold"
+                                    v-else-if="getYearService === 3"
+                                >
+                                    10 Above years
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="small text-muted">Date Joined</div>
+                                <div class="fw-semibold">
+                                    {{ formatDate(getYearJoined) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="my-4">
+                        <h6
+                            class="text-uppercase text-muted small fw-semibold mb-3"
+                        >
+                            Loan Details
+                        </h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="small text-muted">Loan Plan</div>
+                                <div class="fw-semibold">
+                                    {{ getPlanName }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">
+                                    Amount Borrowed
+                                </div>
+                                <div class="fw-semibold">
+                                    {{ currencyFormat(getAmountBorrowed) }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">
+                                    Current Balance
+                                </div>
+                                <div class="fw-semibold">
+                                    {{ currencyFormat(getCurrBalance) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-muted mb-1">Purpose</div>
+                            <p
+                                class="border rounded p-2 bg-light mb-0 purpose-text"
+                            >
+                                {{ getPurpose }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

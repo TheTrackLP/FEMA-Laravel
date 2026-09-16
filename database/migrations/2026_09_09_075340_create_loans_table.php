@@ -20,8 +20,10 @@ return new class extends Migration
             $table->decimal('currbalance');
             $table->decimal('amountborrowed');
             $table->tinyInteger('status')->default(0);
+            $table->dateTime('date_applied')->nullable();
             $table->dateTime('date_approved')->nullable();
             $table->dateTime('date_released')->nullable();
+            $table->dateTime('date_completed')->nullable();
             $table->timestamps();
         });
     }
