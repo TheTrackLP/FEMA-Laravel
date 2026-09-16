@@ -5,7 +5,7 @@ use App\Http\Controllers\BorrowersController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LoansController;
 use App\Http\Controllers\LoanTypesController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymentsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,6 +30,10 @@ Route::middleware('auth')->group(function(){
         Route::get('/admin/loans', 'LoansDashboard')->name('loans.dash');
         Route::post('/admin/loans/store', 'LoansAppliStore')->name('loans.store');
         Route::post('/admin/loans/update/{id}', 'LoansAppliUpdate')->name('loans.update');
+    });
+
+    Route::controller(PaymentsController::class)->group(function(){
+        Route::get('/admin/payments', 'PaymentsDashboard')->name('pays.dash');
     });
 
     Route::controller(DepartmentController::class)->group(function(){

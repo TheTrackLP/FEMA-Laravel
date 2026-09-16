@@ -24,8 +24,8 @@ import { Link } from "@inertiajs/vue3";
             <Link :href="route('loans.dash')" class="nav-link"
                 ><i class="fa-solid fa-users"></i> Loans</Link
             >
-            <a href="#" class="nav-link"
-                ><i class="bi bi-credit-card"></i> Payments</a
+            <Link :href="route('pays.dash')" class="nav-link"
+                ><i class="fa-solid fa-money-bill"></i> Payments</Link
             >
             <Link :href="route('types.dash')" class="nav-link"
                 ><i class="fa-solid fa-list"></i> Loan Types</Link
