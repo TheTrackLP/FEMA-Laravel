@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->string('ofrec');
+            $table->integer('loan_id');
+            $table->integer('borrower_id');
+            $table->integer('type_id');
+            $table->decimal('total_paid')->nullable();
+            $table->decimal('balance_after')->nullable();
+            $table->decimal('principal')->nullable();
+            $table->decimal('interest')->nullable();
+            $table->decimal('capital')->nullable();
+            $table->decimal('penalty')->nullable();
             $table->timestamps();
         });
     }

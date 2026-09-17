@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function(){
 
     Route::controller(PaymentsController::class)->group(function(){
         Route::get('/admin/payments', 'PaymentsDashboard')->name('pays.dash');
+        Route::post('/admin/payments/store', 'PaymentsStore')->name('pays.store');
+        Route::get('/admin/loans/{loan}/current-schedule', 'currentSchedule');
     });
 
     Route::controller(DepartmentController::class)->group(function(){

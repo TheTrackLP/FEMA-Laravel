@@ -281,10 +281,13 @@ export default {
                     </td>
                     <td class="text-start">
                         <p>
-                            Total Paid: <strong>{{ loan.fullname }}</strong>
+                            Total Paid: <strong>{{ loan.total_paid }}</strong>
                         </p>
                         <p>
-                            Remaining Balance: <strong>{{ loan.plan }}</strong>
+                            Remaining Balance:
+                            <strong>{{
+                                currencyFormat(loan.currbalance)
+                            }}</strong>
                         </p>
                     </td>
                     <td>Name</td>

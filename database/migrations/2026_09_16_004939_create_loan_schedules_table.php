@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('loan_id');
             $table->timestamp('date_due');
-            $table->tinyInteger('status');
+            $table->tinyInteger('is_paid');
             $table->timestamps();
         });
     }
