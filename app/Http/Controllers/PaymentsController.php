@@ -91,10 +91,15 @@ class PaymentsController extends Controller
     }
 
     public function currentSchedule($id){
+        $offset = Payments::where('loan_id', $id)->count();
         $schedule = LoanSchedules::where('loan_id', $id)
-                ->where('is_paid', false)
-                ->orderBy('date_due')
-                ->first();
-        return response()->json($schedule);
+                ->limit(1)
+                ->offset($offset)
+                ->get();
+
+        return response()->json([
+            'schedule'=>$schedule,
+            'offset'=>$offset,
+        ]);
     }
 }

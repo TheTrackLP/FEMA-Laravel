@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function(){
         Route::get('/admin/loans', 'LoansDashboard')->name('loans.dash');
         Route::post('/admin/loans/store', 'LoansAppliStore')->name('loans.store');
         Route::post('/admin/loans/update/{id}', 'LoansAppliUpdate')->name('loans.update');
+        Route::get('/admin/loans/{id}/next-payment-schedule', 'NextPaymentDetails');
     });
 
     Route::controller(PaymentsController::class)->group(function(){

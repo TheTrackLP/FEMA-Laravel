@@ -6,6 +6,7 @@ use App\Models\Borrowers;
 use App\Models\Loans;
 use App\Models\LoanSchedules;
 use App\Models\LoanTypes;
+use App\Models\Payments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -139,4 +140,21 @@ class LoansController extends Controller
             'success', 'Success, Loan Application Update',
         );
     }
+
+    public function NextPaymentDetails($id){
+        $loanid = Loans::findorfail($id);
+        $offset = Payments::where('loan_id', $loanid->id)->count();
+        $schedule = LoanSchedules::select('*')
+                ->where('loan_id', $loanid->id)
+                ->limit(1)
+                ->offset($offset)
+                ->get();
+
+        return response()->json([
+            'schedule'=>$schedule,
+            'offset'=>$offset,
+        ]);
+    }
+
+
 }

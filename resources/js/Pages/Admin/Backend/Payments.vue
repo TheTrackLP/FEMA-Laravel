@@ -79,13 +79,15 @@ const openPaymentModal = () => {
 };
 
 const currentSchedule = ref(null);
+const offset = ref(null);
 
 watch(
     () => paymentForm.loan_id,
     (loanid) => {
         if (!loanid) return;
         axios.get(`/admin/loans/${loanid}/current-schedule`).then((res) => {
-            currentSchedule.value = res.data;
+            currentSchedule.value = res.data.schedule;
+            offset.value = res.data.offset;
         });
     },
 );
@@ -280,7 +282,7 @@ export default {
             </tbody>
         </table>
     </div>
-
+    <p v-for="value in currentSchedule">{{ value.date_due }}</p>
     <div class="modal fade" ref="modalRef" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">

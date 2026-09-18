@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, ref, computed } from "vue";
+import { nextTick, ref, computed, watch, onMounted } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import { Modal } from "bootstrap";
 import { currencyFormat, formatDate } from "@/reuseables";
@@ -58,6 +58,8 @@ const fetctApplication = (loan) => {
     readonlyField.value = true;
     statusView.value = true;
     openModal();
+
+    axios.get(`/admin/loans/${loan.id}`);
 };
 
 const getBorrowerName = ref("");
@@ -118,6 +120,32 @@ const loanApplicationForm = () => {
     }
 };
 
+const nextPayment = ref(null);
+const nextSchedule = ref([]);
+
+// watch(
+//     () => nextPayment.value,
+//     (loanid) => {
+//         if (!loanid) return;
+//         axios.get(`/admin/loans/${loanid}/current-schedule`).then((res) => {
+//             nextSchedule.value = res.data.schedule;
+//         });
+//     },
+// );
+
+onMounted(async () => {
+    for (const loan of props.loans) {
+        if (loan.status !== 2) continue;
+        try {
+            const res = await axios.get(
+                `/admin/loans/${loan.id}/next-payment-schedule`,
+            );
+            nextSchedule.value[loan.id] = res.data.schedule;
+        } catch (err) {
+            console.error(`Failed to fetch schedule for loan ${loan.id}:`, err);
+        }
+    }
+});
 const props = defineProps({
     borrowers: Array,
     types: Array,
@@ -290,7 +318,14 @@ export default {
                             }}</strong>
                         </p>
                     </td>
-                    <td>Name</td>
+                    <td>
+                        <p v-if="loan.status === 2">
+                            <span v-if="nextSchedules[loan.id]">
+                                {{ nextSchedules[loan.id].date_due }}
+                            </span>
+                        </p>
+                        <p v-else>No Payment Details Yet</p>
+                    </td>
                     <td>
                         <span
                             class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
