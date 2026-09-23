@@ -120,32 +120,25 @@ const loanApplicationForm = () => {
     }
 };
 
-const nextPayment = ref(null);
-const nextSchedule = ref([]);
-
-// watch(
-//     () => nextPayment.value,
-//     (loanid) => {
-//         if (!loanid) return;
-//         axios.get(`/admin/loans/${loanid}/current-schedule`).then((res) => {
-//             nextSchedule.value = res.data.schedule;
-//         });
-//     },
-// );
+const nextSchedule = ref({});
 
 onMounted(async () => {
     for (const loan of props.loans) {
         if (loan.status !== 2) continue;
-        try {
-            const res = await axios.get(
-                `/admin/loans/${loan.id}/next-payment-schedule`,
-            );
-            nextSchedule.value[loan.id] = res.data.schedule;
-        } catch (err) {
-            console.error(`Failed to fetch schedule for loan ${loan.id}:`, err);
-        }
+        const res = await axios.get(
+            `/admin/loans/${loan.id}/next-payment-schedule`,
+        );
+        nextSchedule.value[loan.id] = res.data.schedule;
     }
 });
+
+const addPenalty = computed(() => {
+        const dueDate = nextSchedule[loan.id].date_due
+        ? new Date(nextSchedule[loan.id].date_due)
+        : null;
+    const today = new Date();
+    
+})
 const props = defineProps({
     borrowers: Array,
     types: Array,
@@ -318,11 +311,13 @@ export default {
                             }}</strong>
                         </p>
                     </td>
-                    <td>
+                    <td class="text-start">
                         <p v-if="loan.status === 2">
-                            <span v-if="nextSchedules[loan.id]">
-                                {{ nextSchedules[loan.id].date_due }}
+                            <span v-if="nextSchedule[loan.id]">
+                                {{ formatDate(nextSchedule[loan.id].date_due) }}
                             </span>
+                            <p class="text-primary">Principal: </p>
+                            <p class="text-danger">Penalty: </p>
                         </p>
                         <p v-else>No Payment Details Yet</p>
                     </td>

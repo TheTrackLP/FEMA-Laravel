@@ -142,13 +142,13 @@ class LoansController extends Controller
     }
 
     public function NextPaymentDetails($id){
-        $loanid = Loans::findorfail($id);
-        $offset = Payments::where('loan_id', $loanid->id)->count();
-        $schedule = LoanSchedules::select('*')
-                ->where('loan_id', $loanid->id)
-                ->limit(1)
+        $offset = Payments::where('loan_id', $id)->count();
+        $schedule = LoanSchedules::select('date_due')
+                ->where('loan_id', $id)
+                ->orderby('date_due')
                 ->offset($offset)
-                ->get();
+                ->limit(1)
+                ->first();
 
         return response()->json([
             'schedule'=>$schedule,
