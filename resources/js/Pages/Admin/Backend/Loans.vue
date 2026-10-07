@@ -58,8 +58,6 @@ const fetctApplication = (loan) => {
     readonlyField.value = true;
     statusView.value = true;
     openModal();
-
-    axios.get(`/admin/loans/${loan.id}`);
 };
 
 const getBorrowerName = ref("");
@@ -132,13 +130,29 @@ onMounted(async () => {
     }
 });
 
+const principal = ref(500);
+const withInterest = ref("");
+
+const ifBimonthDate = computed(() => {
+    const today = new Date();
+    const dayNumber = today.getDate();
+
+    if (dayNumber <= 16) {
+        return 500;
+    }
+});
+
+const getDay = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).getDate();
+};
+
 const addPenalty = computed(() => {
-        const dueDate = nextSchedule[loan.id].date_due
+    const dueDate = nextSchedule[loan.id].date_due
         ? new Date(nextSchedule[loan.id].date_due)
         : null;
     const today = new Date();
-    
-})
+});
 const props = defineProps({
     borrowers: Array,
     types: Array,
@@ -302,7 +316,10 @@ export default {
                     </td>
                     <td class="text-start">
                         <p>
-                            Total Paid: <strong>{{ loan.total_paid }}</strong>
+                            Total Paid:
+                            <strong>{{
+                                currencyFormat(loan.total_paid)
+                            }}</strong>
                         </p>
                         <p>
                             Remaining Balance:
@@ -312,14 +329,60 @@ export default {
                         </p>
                     </td>
                     <td class="text-start">
-                        <p v-if="loan.status === 2">
-                            <span v-if="nextSchedule[loan.id]">
-                                {{ formatDate(nextSchedule[loan.id].date_due) }}
-                            </span>
-                            <p class="text-primary">Principal: </p>
-                            <p class="text-danger">Penalty: </p>
-                        </p>
-                        <p v-else>No Payment Details Yet</p>
+                        <div v-if="loan.status === 2">
+                            <div v-if="nextSchedule[loan.id]">
+                                <div
+                                    v-if="
+                                        getDay(
+                                            nextSchedule[loan.id].date_due,
+                                        ) <= 16
+                                    "
+                                >
+                                    <p>
+                                        {{
+                                            formatDate(
+                                                nextSchedule[loan.id].date_due,
+                                            )
+                                        }}
+                                    </p>
+                                    <p class="text-primary">
+                                        <b
+                                            >Principal:
+                                            {{
+                                                currencyFormat(ifBimonthDate)
+                                            }}</b
+                                        >
+                                    </p>
+                                </div>
+                                <div v-else>
+                                    <p>
+                                        {{
+                                            formatDate(
+                                                nextSchedule[loan.id].date_due,
+                                            )
+                                        }}
+                                    </p>
+                                    <p class="text-primary">
+                                        <b
+                                            >Principal:
+                                            {{ currencyFormat(principal) }}</b
+                                        >
+                                    </p>
+                                    <p class="text-danger">
+                                        <b
+                                            >Interest:
+                                            {{
+                                                currencyFormat(
+                                                    (loan.interest_rate / 100) *
+                                                        loan.currbalance,
+                                                )
+                                            }}
+                                        </b>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else>No Payment Details Yet</div>
                     </td>
                     <td>
                         <span

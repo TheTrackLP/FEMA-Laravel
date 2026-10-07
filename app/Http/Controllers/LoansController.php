@@ -25,10 +25,14 @@ class LoansController extends Controller
                 'borrowers.yearservice',
                 'borrowers.datejoined',
                 'loan_types.name as plan',
+                'loan_types.interest_rate',
                 DB::raw("CONCAT(loan_types.name, ' [',loan_types.interest_rate , '% interest, ', loan_types.penalty,'% penalty]') as fullplan"),
+                DB::raw("SUM(payments.principal + interest) as total_paid")
             )
-            ->join('borrowers', 'borrowers.id', '=', 'loans.borrower_id')
-            ->join('loan_types', 'loan_types.id', '=', 'loans.loantype_id')
+            ->leftJoin('borrowers', 'borrowers.id', '=', 'loans.borrower_id')
+            ->leftJoin('loan_types', 'loan_types.id', '=', 'loans.loantype_id')
+            ->leftJoin('payments', 'payments.loan_id', '=', 'loans.id')
+            ->groupBy('loans.id')
             ->get(),
         ]);
     }
