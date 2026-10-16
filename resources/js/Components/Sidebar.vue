@@ -114,13 +114,15 @@ img {
                     </Link>
                 </li>
                 <li class="nav-item">
-                    <a
+                    <Link
                         class="nav-link d-flex align-items-center gap-2"
+                        :href="route('accts.dash')"
+                        :class="{ active: isActive('accts.*') }"
                         title="Accounts"
                     >
                         <i class="fa-solid fa-users"></i
                         ><span class="nav-text">Staff/Borrowers</span>
-                    </a>
+                    </Link>
                 </li>
                 <li class="nav-item">
                     <Link

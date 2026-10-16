@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BorrowersController;
 use App\Http\Controllers\DepartmentController;
@@ -50,6 +51,10 @@ Route::middleware('auth')->group(function(){
         Route::post('/admin/loan-type/store', 'LoanTypesStore')->name('types.store');
         Route::post('/admin/loan-type/update/{id}', 'LoanTypesUpdate')->name('types.update');
         Route::post('/admin/loan-type/status/{id}', 'LoanTypesStatus')->name('type.stat');
+    });
+
+    Route::controller(AccountsController::class)->group(function(){
+        Route::get('/admin/accounts', 'AccountsDashboard')->name('accts.dash');
     });
 });
 
