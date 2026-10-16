@@ -116,7 +116,7 @@ export default {
 <style>
 .table-responsive {
     overflow: auto;
-    max-height: 730px;
+    max-height: 45rem;
 }
 .table-responsive th {
     position: sticky;

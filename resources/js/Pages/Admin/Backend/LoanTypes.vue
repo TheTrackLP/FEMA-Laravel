@@ -81,17 +81,17 @@ export default {
 </script>
 <style>
 .title-cell {
-    max-width: 340px;
+    max-width: 330px;
 }
 .title-cell .t-truncate {
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 .table-responsive {
     overflow: auto;
-    max-height: 625px;
+    max-height: 37rem;
 }
 .table-responsive th {
     position: sticky;

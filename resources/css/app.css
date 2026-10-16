@@ -45,6 +45,10 @@ body {
     min-height: 56px;
 }
 
+label {
+    font-weight: bold;
+}
+
 /* Desktop only: sidebar always visible, expanded <-> icon-only */
 @media (min-width: 992px) {
     .offcanvas.offcanvas-start.sidebar {

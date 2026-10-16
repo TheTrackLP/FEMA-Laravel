@@ -46,6 +46,21 @@ export default {
     layout: AdminLayout,
 };
 </script>
+<style>
+.table-responsive {
+    overflow: auto;
+    max-height: 40rem;
+}
+.table-responsive th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+td,
+p {
+    margin: 0;
+}
+</style>
 <template>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -114,41 +129,48 @@ export default {
                         <h3>Department Lists</h3>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th class="text-center">
-                                        Department Details
-                                    </th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(dept, index) in depts" :key="index">
-                                    <td class="align-middle">
-                                        <p>
-                                            Name:
-                                            <b>{{ dept.name }}</b>
-                                        </p>
-                                        <p>
-                                            Acronym:
-                                            <b>{{ dept.acronym }}</b>
-                                        </p>
-                                        <p>
-                                            code: <b>{{ dept.code }}</b>
-                                        </p>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                        <button class="btn btn-outline-success">
-                                            <i
-                                                class="fa-solid fa-file"
-                                                @click="fetchDept(dept)"
-                                            ></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-center">
+                                            Department Details
+                                        </th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="(dept, index) in depts"
+                                        :key="index"
+                                    >
+                                        <td class="align-middle">
+                                            <p>
+                                                Name:
+                                                <b>{{ dept.name }}</b>
+                                            </p>
+                                            <p>
+                                                Acronym:
+                                                <b>{{ dept.acronym }}</b>
+                                            </p>
+                                            <p>
+                                                code: <b>{{ dept.code }}</b>
+                                            </p>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <button
+                                                class="btn btn-outline-success"
+                                            >
+                                                <i
+                                                    class="fa-solid fa-file"
+                                                    @click="fetchDept(dept)"
+                                                ></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

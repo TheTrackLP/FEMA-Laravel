@@ -11,8 +11,8 @@ const isActive = (routeName) => {
 <style>
 img {
     display: block;
-    max-width: 140px;
-    max-height: 150px;
+    max-width: 50px;
+    max-height: 50px;
     width: auto;
     height: auto;
     margin-left: auto;
@@ -26,10 +26,10 @@ img {
         <a
             href="#"
             class="d-flex align-items-center gap-2 text-white text-decoration-none fw-semibold fs-5"
-            title="My Admin System"
+            title="FEMA"
         >
-            <i class="fa-solid fa-school"></i>
-            <span class="nav-text">Loan System</span>
+            <img class="rounded-circle py-1" src="/img/femalogo.png" />
+            <span class="nav-text">FEMA</span>
         </a>
         <button
             type="button"
@@ -40,11 +40,11 @@ img {
     </div>
 
     <div class="offcanvas-body d-flex flex-column px-2 py-3">
-        <img class="rounded-circle py-1 mb-3" src="/img/femalogo.png" />
-
         <!-- Navigation -->
         <nav aria-label="Main menu">
             <ul class="nav nav-pills flex-column gap-1">
+                <div class="nav-section-label">Overview</div>
+
                 <li class="nav-item">
                     <Link
                         class="nav-link d-flex align-items-center gap-2"
@@ -61,42 +61,36 @@ img {
                         class="nav-link d-flex align-items-center gap-2"
                         :href="route('borrow.dash')"
                         :class="{ active: isActive('borrow.*') }"
-                        title="Users"
+                        title="Borrowers"
                     >
                         <i class="fa-solid fa-people-group"></i
                         ><span class="nav-text">Borrowers</span>
                     </Link>
                 </li>
+                <div class="nav-section-label">Loans</div>
                 <li class="nav-item">
-                    <a
+                    <Link
                         class="nav-link d-flex align-items-center gap-2"
-                        href="#"
-                        title="Employees"
+                        :href="route('loans.dash')"
+                        :class="{ active: isActive('loans.*') }"
+                        title="Loans"
                     >
                         <i class="fa-solid fa-lines-leaning"></i
                         ><span class="nav-text">Loans</span>
-                    </a>
+                    </Link>
                 </li>
                 <li class="nav-item">
-                    <a
+                    <Link
                         class="nav-link d-flex align-items-center gap-2"
-                        href="#"
-                        title="Departments"
+                        :href="route('pays.dash')"
+                        :class="{ active: isActive('pays.*') }"
+                        title="Payments"
                     >
                         <i class="fa-solid fa-money-bill"></i
                         ><span class="nav-text">Payments</span>
-                    </a>
+                    </Link>
                 </li>
-                <li class="nav-item">
-                    <a
-                        class="nav-link d-flex align-items-center gap-2"
-                        href="#"
-                        title="Reports"
-                    >
-                        <i class="fa-solid fa-boxes-stacked"></i
-                        ><span class="nav-text">Loan Types</span>
-                    </a>
-                </li>
+                <div class="nav-section-label">Manage</div>
                 <li class="nav-item">
                     <a
                         class="nav-link d-flex align-items-center gap-2"
@@ -107,25 +101,37 @@ img {
                         ><span class="nav-text">Reports</span>
                     </a>
                 </li>
+                <div class="nav-section-label">Settings</div>
+                <li class="nav-item">
+                    <Link
+                        class="nav-link d-flex align-items-center gap-2"
+                        :href="route('types.dash')"
+                        :class="{ active: isActive('types.*') }"
+                        title="Reports"
+                    >
+                        <i class="fa-solid fa-boxes-stacked"></i
+                        ><span class="nav-text">Loan Types</span>
+                    </Link>
+                </li>
                 <li class="nav-item">
                     <a
                         class="nav-link d-flex align-items-center gap-2"
-                        href="#"
-                        title="Settings"
+                        title="Accounts"
                     >
                         <i class="fa-solid fa-users"></i
                         ><span class="nav-text">Staff/Borrowers</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a
+                    <Link
                         class="nav-link d-flex align-items-center gap-2"
-                        href="#"
+                        :href="route('dept.dash')"
+                        :class="{ active: isActive('dept.*') }"
                         title="Settings"
                     >
                         <i class="fa-solid fa-building"></i
                         ><span class="nav-text">Departments</span>
-                    </a>
+                    </Link>
                 </li>
             </ul>
         </nav>
