@@ -36,6 +36,7 @@ class PaymentsController extends Controller
             )
             ->join('borrowers', 'borrowers.id', '=', 'loans.borrower_id')
             ->join('loan_types', 'loan_types.id', '=', 'loans.loantype_id')
+            ->where('loans.status', 2)
             ->get(),
             'loanTimeline'=>LoanSchedules::all(),
         ]);

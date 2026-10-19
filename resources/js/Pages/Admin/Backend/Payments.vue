@@ -2,7 +2,7 @@
 import { nextTick, ref, computed, watch } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import { Modal } from "bootstrap";
-import { currencyFormat, formatDate } from "@/reuseables";
+import { currencyFormat, formatDate, formatDateTime } from "@/reuseables";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -40,6 +40,15 @@ const reciptRemainBalance = ref("");
 const openReceiptModal = (pay) => {
     openViewModal();
     reciptRefno.value = pay.ofrec;
+    reciptDatePaid.value = pay.created_at;
+    reciptBorrower.value = pay.fullname;
+    reciptLoanRefno.value = pay.refno;
+    reciptPrincipal.value = pay.principal;
+    reciptInterest.value = pay.interest;
+    reciptPenalty.value = pay.penalty;
+    reciptCapital.value = pay.capital;
+    reciptTotalPaid.value = pay.total_paid;
+    reciptRemainBalance.value = pay.balance_after;
 };
 
 const closeModal = () => {
@@ -93,14 +102,15 @@ watch(
 );
 
 const addInterest = computed(() => {
-    const day = new Date().getDate();
+    const dueDate = currentSchedule.value?.date_due
+        ? new Date(currentSchedule.value.date_due)
+        : null;
     const currbalance = Number(fetchLoanData.value?.currbalance) || 0;
     const rate = Number(fetchLoanData.value?.interest_rate) / 100;
-    if (day <= 15) {
+    if (dueDate <= 15) {
         return Number(0);
-    } else {
-        return currbalance * rate;
     }
+    return currbalance * rate;
 });
 
 const addPenalty = computed(() => {
@@ -173,6 +183,10 @@ export default {
 }
 .receipt-divider {
     border-top: 1px dashed #adb5bd;
+}
+td,
+p {
+    margin: 0;
 }
 @media print {
     .no-print {
@@ -282,7 +296,6 @@ export default {
             </tbody>
         </table>
     </div>
-    <p v-for="value in currentSchedule">{{ value.date_due }}</p>
     <div class="modal fade" ref="modalRef" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
@@ -291,6 +304,10 @@ export default {
                         <h5 class="modal-title text-success fw-bold">
                             Payment Form
                         </h5>
+                        <p v-for="value in currentSchedule">
+                            {{ value.date_due }}
+                            {{ value.id }}
+                        </p>
                         <span class="ms-auto me-3 fw-semibold" id="timestamp">{{
                             formatDate(currDate)
                         }}</span>
@@ -559,60 +576,66 @@ export default {
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Date Paid</span>
-                        <span class="fw-semibold">Oct 27, 2025, 10:32 AM</span>
+                        <span class="fw-semibold">{{
+                            formatDateTime(reciptDatePaid)
+                        }}</span>
                     </div>
 
                     <div class="receipt-divider my-3"></div>
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Borrower</span>
-                        <span class="fw-semibold">Marco, Echo E</span>
+                        <span class="fw-semibold">{{ reciptBorrower }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Loan Plan</span>
-                        <span class="fw-semibold">Short Term Loan</span>
+                        <span class="fw-semibold">{{ reciptType }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Loan Ref #</span>
-                        <span class="fw-semibold">FEMA-LOAN-2026-00012</span>
+                        <span class="fw-semibold">{{ reciptLoanRefno }}</span>
                     </div>
 
                     <div class="receipt-divider my-3"></div>
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Principal</span>
-                        <span>₱500.00</span>
+                        <span>{{ currencyFormat(reciptPrincipal) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Interest</span>
-                        <span>₱0.00</span>
+                        <span>{{ currencyFormat(reciptInterest) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Penalty</span>
-                        <span>₱0.00</span>
+                        <span>{{ currencyFormat(reciptPenalty) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Paid-in Capital</span>
-                        <span>₱0.00</span>
+                        <span>{{ currencyFormat(reciptCapital) }}</span>
                     </div>
 
                     <div class="receipt-divider my-3"></div>
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="fw-bold">Total Paid</span>
-                        <span class="fw-bold text-success">₱500.00</span>
+                        <span class="fw-bold text-success">{{
+                            currencyFormat(reciptTotalPaid)
+                        }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span class="text-muted">Remaining Balance</span>
-                        <span class="fw-semibold text-danger">₱4,000.00</span>
+                        <span class="fw-semibold text-danger">{{
+                            currencyFormat(reciptRemainBalance)
+                        }}</span>
                     </div>
 
                     <div class="receipt-divider my-3"></div>
 
-                    <div class="text-center small text-muted">
+                    <!-- <div class="text-center small text-muted">
                         Received by: <strong>J. Santos</strong><br />
                         This receipt is system-generated.
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="modal-footer no-print">
