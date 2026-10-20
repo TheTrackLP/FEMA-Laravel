@@ -11,7 +11,7 @@ defineProps({
 });
 
 const form = useForm({
-    email: "",
+    login: "",
     password: "",
     remember: false,
 });
@@ -56,6 +56,12 @@ body {
                             Sign in to access the FEMA Loan Management System.
                         </p>
                     </div>
+                    <div
+                        v-if="Object.keys(form.errors).length"
+                        class="alert alert-danger py-2 small mb-3"
+                    >
+                        Please check the fields below and try again.
+                    </div>
                     <form @submit.prevent="submit">
                         <div class="mb-3">
                             <label for="username" class="form-label"
@@ -69,11 +75,15 @@ body {
                                     type="text"
                                     class="form-control"
                                     placeholder="Enter your username or email"
+                                    :class="{ 'is-invalid': form.errors.login }"
                                     required
-                                    v-model="form.email"
+                                    v-model="form.login"
                                 />
-                                <div class="invalid-feedback">
-                                    Please enter your username or email.
+                                <div
+                                    v-if="form.errors.login"
+                                    class="invalid-feedback"
+                                >
+                                    {{ form.errors.login }}
                                 </div>
                             </div>
                         </div>
@@ -89,10 +99,16 @@ body {
                                     type="password"
                                     class="form-control"
                                     placeholder="Enter your password"
+                                    :class="{
+                                        'is-invalid': form.errors.password,
+                                    }"
                                     required
                                     v-model="form.password"
                                 />
-                                <div class="invalid-feedback">
+                                <div
+                                    class="invalid-feedback"
+                                    v-if="form.errors.password"
+                                >
                                     Please enter your password.
                                 </div>
                             </div>

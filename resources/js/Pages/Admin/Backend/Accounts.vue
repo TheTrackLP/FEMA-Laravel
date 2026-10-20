@@ -1,9 +1,11 @@
 <script setup>
-import { Head } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import { nextTick, ref } from "vue";
 import { Modal } from "bootstrap";
+import { formatDate } from "@/reuseables";
 
 const accordionOpen = ref(false);
+const checkboxPassword = ref(false);
 
 const modalRef = ref(null);
 let modalInstance = null;
@@ -14,11 +16,67 @@ const openFormModal = () => {
     });
 };
 
+const closeModal = () => {
+    modalInstance?.hide();
+    accountsForm.reset();
+};
+
 const checkBoxShow = ref(false);
+
+const accountsFormMode = ref("create");
+
+const accountsForm = useForm({
+    borrower_id: "",
+    name: "",
+    username: "",
+    email: "",
+    roles: "",
+    status: "",
+    password: "",
+    confirmPass: "",
+});
+
+const submitAccountForm = () => {
+    if (accountsFormMode.value === "create") {
+        accountsFormMode.value = "create";
+        accountsForm.post(route("accts.create"), {
+            onSuccess: () => {
+                accountsForm.reset();
+                closeModal();
+            },
+        });
+    } else {
+        accountsFormMode.value = "edit";
+        accountsForm.post(route("accts.update", accountsForm.id), {
+            onSuccess: () => {
+                accountsForm.reset();
+                closeModal();
+            },
+        });
+    }
+};
 
 const openAccountModal = () => {
     openFormModal();
+    accountsFormMode.value = "create";
 };
+
+const fetchAccountData = (acct) => {
+    accountsFormMode.value = "edit";
+    openFormModal();
+    accountsForm.id = acct.id;
+    accountsForm.borrower_id = acct.borrower_id;
+    accountsForm.name = acct.name;
+    accountsForm.username = acct.username;
+    accountsForm.email = acct.email;
+    accountsForm.roles = acct.roles;
+    accountsForm.status = acct.status;
+};
+
+const props = defineProps({
+    accounts: Array,
+    borrowers: Array,
+});
 </script>
 
 <script>
@@ -77,9 +135,8 @@ export default {
                                 class="form-select"
                             >
                                 <option value="">Select Status</option>
-                                <option :value="0">Pending</option>
                                 <option :value="1">Active</option>
-                                <option :value="2">Disabled</option>
+                                <option :value="0">Inactive</option>
                             </select>
                         </div>
                     </div>
@@ -101,24 +158,50 @@ export default {
             </thead>
             <tbody>
                 <tr
-                    v-for="(borrow, index) in 2"
+                    v-for="(acct, index) in accounts"
                     :key="index"
                     class="text-center align-middle"
                 >
                     <td>{{ index + 1 }}</td>
                     <td class="text-start">
-                        <div class="fw-semibold">Juan Dela Cruz</div>
+                        <div class="fw-semibold" v-if="acct.borrower_id">
+                            {{ acct.fullname }}
+                        </div>
+                        <div class="fw-semibold" v-else>{{ acct.name }}</div>
                         <small class="text-muted"
-                            >@jdelacruz &middot; juan@example.com</small
+                            >@{{ acct.username }} &middot;
+                            {{ acct.email }}</small
                         >
                     </td>
-                    <td>Role</td>
                     <td>
-                        <span class="badge text-bg-secondary">Pending</span>
+                        <span
+                            class="badge text-bg-primary"
+                            v-if="acct.roles == 'admin'"
+                            >Admin</span
+                        >
                     </td>
-                    <td>Date</td>
+                    <td>
+                        <span
+                            class="badge text-bg-success"
+                            v-if="acct.status === 1"
+                            >Active</span
+                        >
+                        <span
+                            class="badge text-bg-danger"
+                            v-else-if="acct.status === 0"
+                            >Inactive</span
+                        >
+                    </td>
+                    <td>
+                        <p v-if="acct.datejoined">
+                            {{ formatDate(acct.datejoined) }}
+                        </p>
+                    </td>
                     <td class="text-center">
-                        <button class="btn btn-outline-warning">
+                        <button
+                            class="btn btn-outline-warning"
+                            @click="fetchAccountData(acct)"
+                        >
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                     </td>
@@ -134,33 +217,42 @@ export default {
         </table>
     </div>
 
-    <div class="modal fade" ref="modalRef" tabindex="-1">
+    <div
+        class="modal fade"
+        ref="modalRef"
+        tabindex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+    >
         <div class="modal-dialog">
-            <form action="">
+            <form @submit.prevent="submitAccountForm">
                 <div class="modal-content">
-                    <div
-                        class="modal-header"
-                        style="background: var(--navy); color: #fff"
-                    >
-                        <h5
-                            class="modal-title font-display"
-                            style="font-size: 1.05rem"
-                        >
-                            User Form
-                        </h5>
+                    <div class="modal-header">
+                        <h4 class="modal-title font-display">Accounts Form</h4>
                         <button
                             type="button"
-                            class="btn-close btn-close-white"
+                            class="btn-close btn-close"
+                            @click="closeModal"
                         ></button>
                     </div>
-                    <input type="hidden" />
+                    <input type="hidden" v-model="accountsForm.id" />
                     <div class="modal-body">
                         <div class="form-group mb-3" v-if="checkBoxShow">
-                            <label for="">Author</label>
+                            <label for="">Borrower</label>
                             <v-select
-                                label="fullname"
-                                placeholder="Select Author"
-                            ></v-select>
+                                :options="borrowers"
+                                :reduce="(borrow) => borrow.id"
+                                label="empid"
+                                placeholder="Select Borrower"
+                                v-model="accountsForm.borrower_id"
+                            >
+                                <template #option="borrow">
+                                    {{ borrow.fullname }} | {{ borrow.empid }}
+                                </template>
+                                <template #selected-option="borrow">
+                                    {{ borrow.fullname }} | {{ borrow.empid }}
+                                </template>
+                            </v-select>
                         </div>
                         <div class="form-group mb-3" v-else>
                             <label for="">Name</label>
@@ -168,6 +260,7 @@ export default {
                                 type="text"
                                 class="form-control"
                                 placeholder="e.g. Juan Dela Cruz"
+                                v-model="accountsForm.name"
                             />
                         </div>
                         <div class="form-check mb-3">
@@ -178,7 +271,7 @@ export default {
                                 id="checkDefault"
                             />
                             <label class="form-check-label" for="checkDefault">
-                                Check if Author
+                                Check if Borrower
                             </label>
                         </div>
                         <div class="form-group mb-3">
@@ -187,6 +280,7 @@ export default {
                                 type="text"
                                 class="form-control"
                                 placeholder="e.g. JuanDelaCruz223"
+                                v-model="accountsForm.username"
                             />
                         </div>
                         <div class="form-group mb-3">
@@ -195,23 +289,30 @@ export default {
                                 type="email"
                                 class="form-control"
                                 placeholder="e.g. juandelacruz@example.com"
+                                v-model="accountsForm.email"
                             />
                         </div>
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="">Role</label>
-                                    <select class="form-control">
-                                        <option value="" selected>
-                                            Select Role
-                                        </option>
+                                    <select
+                                        class="form-control"
+                                        v-model="accountsForm.roles"
+                                    >
+                                        <option value="">Select Role</option>
                                         <option value="admin">Admin</option>
-                                        <option value="user">User</option>
+                                        <option value="borrower">
+                                            Borrower
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="">Status</label>
-                                    <select class="form-control">
+                                    <select
+                                        class="form-control"
+                                        v-model="accountsForm.status"
+                                    >
                                         <option value="" selected>
                                             Select Status
                                         </option>
@@ -221,20 +322,46 @@ export default {
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="form-check mb-3">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                v-model="checkboxPassword"
+                                id="checkPassword"
+                            />
+                            <label class="form-check-label" for="checkPassword">
+                                Check if Change Password
+                            </label>
+                        </div>
+                        <div class="row" v-if="checkboxPassword">
                             <div class="col-6 form-group mb-3">
                                 <label for="">Password</label>
-                                <input type="password" class="form-control" />
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    v-model="accountsForm.password"
+                                />
                             </div>
                             <div class="col-6 form-group mb-3">
                                 <label for="">Confirm Password</label>
-                                <input type="password" class="form-control" />
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    v-model="accountsForm.confirmPass"
+                                />
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success px-4">
-                            Save
+                            {{
+                                accountsForm.processing
+                                    ? "Saving..."
+                                    : accountsFormMode === "create"
+                                      ? "Add"
+                                      : "Save"
+                            }}
+                            Account
                         </button>
                     </div>
                 </div>

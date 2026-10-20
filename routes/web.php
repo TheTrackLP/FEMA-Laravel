@@ -18,6 +18,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function(){
     Route::controller(AdminController::class)->group(function(){
         Route::get('/admin/dashboard', 'AdminDashboard')->name('admin.dash');
+        Route::get('/admin/logout', 'AdminLogout')->name('admin.logout');
     });
 
     Route::controller(BorrowersController::class)->group(function(){
@@ -55,6 +56,8 @@ Route::middleware('auth')->group(function(){
 
     Route::controller(AccountsController::class)->group(function(){
         Route::get('/admin/accounts', 'AccountsDashboard')->name('accts.dash');
+        Route::post('/admin/accounts/create', 'AccountsCreation')->name('accts.create');
+        Route::post('/admin/accounts/update/{id}', 'AccountsUpdate')->name('accts.update');
     });
 });
 

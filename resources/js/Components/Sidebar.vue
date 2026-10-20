@@ -142,7 +142,7 @@ img {
         <div class="sidebar-footer mt-auto pt-3">
             <a
                 class="nav-link d-flex align-items-center gap-2"
-                href="#"
+                :href="route('admin.logout')"
                 title="Logout"
             >
                 <i class="fa-solid fa-power-off text-danger"></i
