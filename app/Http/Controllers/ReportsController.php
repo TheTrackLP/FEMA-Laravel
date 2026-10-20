@@ -40,9 +40,9 @@ class ReportsController extends Controller
                 'total_interest'=> $rows->sum('total_interest'),
                 'total_penalty'=> $rows->sum('total_penalty'),
                 'overalltotal'=> $rows->sum('overalltotal'),
-                'loans' => $rows->keyBy('type_id')->map(fn ($r) => [
-                    'principal' => $r->total_paid,
-                    'interest' => $r->total_interest,
+                'loans' => $rows->groupBy('type_id')->map(fn ($r) => [
+                    'principal' => $r->sum('total_paid'),
+                    'interest' => $r->sum('total_interest'),
                 ]),
             ])
             ->values(),

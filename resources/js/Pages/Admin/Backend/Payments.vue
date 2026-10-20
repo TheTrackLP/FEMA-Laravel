@@ -411,6 +411,7 @@ p {
                                                 type="number"
                                                 class="form-control"
                                                 placeholder="0"
+                                                step="any"
                                                 v-model="getInterest"
                                             />
                                         </div>
