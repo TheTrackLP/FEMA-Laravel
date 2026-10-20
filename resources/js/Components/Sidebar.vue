@@ -92,14 +92,15 @@ img {
                 </li>
                 <div class="nav-section-label">Manage</div>
                 <li class="nav-item">
-                    <a
+                    <Link
                         class="nav-link d-flex align-items-center gap-2"
-                        href="#"
+                        :href="route('report.dash')"
+                        :class="{ active: isActive('report.*') }"
                         title="Settings"
                     >
                         <i class="fa-solid fa-chart-simple"></i
                         ><span class="nav-text">Reports</span>
-                    </a>
+                    </Link>
                 </li>
                 <div class="nav-section-label">Settings</div>
                 <li class="nav-item">

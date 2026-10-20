@@ -131,16 +131,6 @@ onMounted(async () => {
 });
 
 const principal = ref(500);
-const withInterest = ref("");
-
-const ifBimonthDate = computed(() => {
-    const today = new Date();
-    const dayNumber = today.getDate();
-
-    if (dayNumber <= 16) {
-        return 500;
-    }
-});
 
 const getDay = (dateStr) => {
     if (!dateStr) return "";
@@ -213,7 +203,10 @@ export default {
     color: #343a40;
     min-height: 100px;
 }
-
+td,
+p {
+    margin: 0;
+}
 @media (max-width: 767.98px) {
     .active-loans-panel {
         border-left: none;
@@ -335,7 +328,7 @@ export default {
                                     v-if="
                                         getDay(
                                             nextSchedule[loan.id].date_due,
-                                        ) <= 16
+                                        ) <= 15
                                     "
                                 >
                                     <p>
@@ -348,9 +341,7 @@ export default {
                                     <p class="text-primary">
                                         <b
                                             >Principal:
-                                            {{
-                                                currencyFormat(ifBimonthDate)
-                                            }}</b
+                                            {{ currencyFormat(principal) }}</b
                                         >
                                     </p>
                                 </div>
@@ -749,7 +740,7 @@ export default {
                             <div class="small text-muted">
                                 {{
                                     getApprovedDate
-                                        ? formatDate(getAppliedDate)
+                                        ? formatDate(getApprovedDate)
                                         : "--"
                                 }}
                             </div>
@@ -762,7 +753,7 @@ export default {
                             <div class="small text-muted">
                                 {{
                                     getReleasedDate
-                                        ? formatDate(getAppliedDate)
+                                        ? formatDate(getReleasedDate)
                                         : "--"
                                 }}
                             </div>

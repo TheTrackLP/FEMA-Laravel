@@ -117,13 +117,13 @@ class LoansController extends Controller
                     LoanSchedules::findorfail($loanid->id)->update([
                         'loan_id' => $loanid->id,
                         'date_due' => $date,
-                        'status' => 0,
+                        'is_paid' => 0,
                     ]);
                 } else {
                     LoanSchedules::create([
                         'loan_id' => $loanid->id,
                         'date_due' => $date,
-                        'status' => 0,
+                        'is_paid' => 0,
                     ]);
                 }
             }

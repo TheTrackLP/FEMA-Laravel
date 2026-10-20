@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LoansController;
 use App\Http\Controllers\LoanTypesController;
 use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\ReportsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -58,6 +59,10 @@ Route::middleware('auth')->group(function(){
         Route::get('/admin/accounts', 'AccountsDashboard')->name('accts.dash');
         Route::post('/admin/accounts/create', 'AccountsCreation')->name('accts.create');
         Route::post('/admin/accounts/update/{id}', 'AccountsUpdate')->name('accts.update');
+    });
+
+    Route::controller(ReportsController::class)->group(function(){
+        Route::get('/admin/reports', 'ReportsDashboard')->name('report.dash');
     });
 });
 
