@@ -56,11 +56,11 @@ class PaymentsController extends Controller
         }
         $year = now()->year;
 
-        $lastLoan = Payments::where('ofrec', 'like', "FEMA-PAY-{$year}-%")
+        $lastPay = Payments::where('ofrec', 'like', "FEMA-PAY-{$year}-%")
                         ->lockForUpdate()
                         ->orderByDesc('id')
                         ->first();
-        $nextNumber = $lastLoan ? ((int) substr($lastLoan->refno, -5)) + 1 : 1;
+        $nextNumber = $lastPay ? ((int) substr($lastPay->ofrec, -5)) + 1 : 1;
 
         $invoice = "FEMA-PAY-" . $year . "-" . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
@@ -71,6 +71,12 @@ class PaymentsController extends Controller
 
         $updateLoanApp->update([
             'currbalance' => $balanceAfter,
+        ]);
+
+        $updateLoanSched = LoanSchedules::findorfail($request->loanSchedId);
+
+        $updateLoanSched->update([
+            'is_paid' => 1,
         ]);
 
         Payments::create([
@@ -96,11 +102,10 @@ class PaymentsController extends Controller
         $schedule = LoanSchedules::where('loan_id', $id)
                 ->limit(1)
                 ->offset($offset)
-                ->get();
+                ->first();
 
         return response()->json([
             'schedule'=>$schedule,
-            'offset'=>$offset,
         ]);
     }
 }

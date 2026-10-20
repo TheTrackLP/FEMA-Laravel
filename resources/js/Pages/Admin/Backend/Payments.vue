@@ -64,6 +64,7 @@ const paymentForm = useForm({
     interest: "",
     capital: "",
     penalty: "",
+    loanSchedId: "",
 });
 
 const fetchLoanData = computed(() => {
@@ -88,15 +89,15 @@ const openPaymentModal = () => {
 };
 
 const currentSchedule = ref(null);
-const offset = ref(null);
 
 watch(
     () => paymentForm.loan_id,
     (loanid) => {
         if (!loanid) return;
+
         axios.get(`/admin/loans/${loanid}/current-schedule`).then((res) => {
             currentSchedule.value = res.data.schedule;
-            offset.value = res.data.offset;
+            paymentForm.loanSchedId = res.data.schedule?.id ?? null;
         });
     },
 );
@@ -107,15 +108,16 @@ const addInterest = computed(() => {
         : null;
     const currbalance = Number(fetchLoanData.value?.currbalance) || 0;
     const rate = Number(fetchLoanData.value?.interest_rate) / 100;
-    if (dueDate <= 15) {
-        return Number(0);
+    if (!dueDate) return 0;
+    if (dueDate.getDate() <= 15) {
+        return 0;
     }
     return currbalance * rate;
 });
 
 const addPenalty = computed(() => {
     const dueDate = currentSchedule.value?.date_due
-        ? new Date(currentSchedule.value.date_due)
+        ? new Date(currentSchedule.value?.date_due)
         : null;
     const today = new Date();
     const penaltyRate = Number(fetchLoanData.value?.penalty) / 100 || 0;
@@ -304,10 +306,9 @@ p {
                         <h5 class="modal-title text-success fw-bold">
                             Payment Form
                         </h5>
-                        <p v-for="value in currentSchedule">
-                            {{ value.date_due }}
-                            {{ value.id }}
-                        </p>
+                        <div v-if="currentSchedule">
+                            Due: {{ formatDate(currentSchedule.date_due) }}
+                        </div>
                         <span class="ms-auto me-3 fw-semibold" id="timestamp">{{
                             formatDate(currDate)
                         }}</span>
