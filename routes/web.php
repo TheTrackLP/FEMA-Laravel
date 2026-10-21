@@ -16,7 +16,7 @@ Route::get('/', function () {
     return Inertia::render('Auth/Login');
 });
 
-Route::middleware('auth')->group(function(){
+Route::middleware(['auth', 'roles:admin'])->group(function(){
     Route::controller(AdminController::class)->group(function(){
         Route::get('/admin/dashboard', 'AdminDashboard')->name('admin.dash');
         Route::get('/admin/logout', 'AdminLogout')->name('admin.logout');
@@ -63,6 +63,13 @@ Route::middleware('auth')->group(function(){
 
     Route::controller(ReportsController::class)->group(function(){
         Route::get('/admin/reports', 'ReportsDashboard')->name('report.dash');
+    });
+});
+
+Route::middleware(['auth', 'roles:borrower'])->group(function(){
+    Route::controller(BorrowersController::class)->group(function(){
+        Route::get('/borrower/dashboard', 'BorrowerAccountDashboard')->name('borrow.acct');
+        Route::get('/borrower/loans/{id}/next-payment-schedule', 'NextPaymentDetails');
     });
 });
 
