@@ -27,10 +27,9 @@ class ReportsController extends Controller
             )
             ->join('borrowers', 'borrowers.id', '=', 'payments.borrower_id')
             ->join('loan_types', 'loan_types.id', '=', 'payments.type_id')
-            ->groupBy('payments.borrower_id', 'payments.type_id', 'borrowers.fullname', 'loan_types.name', 'payments.created_at')
-            ->whereRaw("DATE_FORMAT(payments.created_at, '%Y-%m') = ?", [$curr_date])
+            ->groupBy('payments.borrower_id', 'payments.type_id', 'borrowers.fullname', 'loan_types.name', DB::raw("DATE_FORMAT(payments.created_at, '%Y-%m')"))
             ->get()
-            ->groupBy('borrower_id')
+            ->groupBy(fn ($date) => $date->borrower_id . '-' . $date->month)
             ->map(fn ($rows) => [
                 'borrower_id' => $rows->first()->borrower_id,
                 'month' => $rows->first()->month,
