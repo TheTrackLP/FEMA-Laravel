@@ -63,6 +63,7 @@ Route::middleware(['auth', 'roles:admin'])->group(function(){
 
     Route::controller(ReportsController::class)->group(function(){
         Route::get('/admin/reports', 'ReportsDashboard')->name('report.dash');
+        Route::get('/admin/reports/print', 'PrintReportDate')->name('report.print');
     });
 });
 

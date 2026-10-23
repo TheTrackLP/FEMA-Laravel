@@ -25,6 +25,16 @@ const openViewModal = () => {
         modalInstanceView.show();
     });
 };
+
+const closeFormModal = () => {
+    modalInstance?.hide();
+    paymentForm.reset();
+    getPrincipal.value = "";
+    getInterest.value = "";
+    getPenalty.value = "";
+    getCapital.value = "";
+};
+
 const reciptRefno = ref("");
 const reciptDatePaid = ref("");
 const reciptBorrower = ref("");
@@ -51,10 +61,6 @@ const openReceiptModal = (pay) => {
     reciptRemainBalance.value = pay.balance_after;
 };
 
-const closeModal = () => {
-    modalInstance?.hide();
-};
-
 const paymentForm = useForm({
     loan_id: "",
     borrower_id: "",
@@ -75,6 +81,7 @@ const fetchLoanData = computed(() => {
 const getPrincipal = ref("");
 const getInterest = ref("");
 const getPenalty = ref("");
+const getCapital = ref("");
 
 const totalSummary = computed(() => {
     return (
@@ -141,11 +148,12 @@ const paymentFormSubmit = () => {
         paymentForm.principal = getPrincipal.value;
         paymentForm.interest = getInterest.value;
         paymentForm.penalty = getPenalty.value;
+        paymentForm.capital = getCapital.value;
         paymentForm.type_id = fetchLoanData.value?.loantype_id;
         paymentForm.post(route("pays.store"), {
             onSuccess: () => {
                 paymentForm.reset();
-                closeModal();
+                closeFormModal();
             },
         });
     } else {
@@ -298,7 +306,14 @@ p {
             </tbody>
         </table>
     </div>
-    <div class="modal fade" ref="modalRef" tabindex="-1" aria-hidden="true">
+    <div
+        class="modal fade"
+        ref="modalRef"
+        tabindex="-1"
+        aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+    >
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <form @submit.prevent="paymentFormSubmit">
@@ -315,7 +330,7 @@ p {
                         <button
                             type="button"
                             class="btn-close"
-                            data-bs-dismiss="modal"
+                            @click="closeFormModal"
                         ></button>
                     </div>
 
@@ -419,6 +434,7 @@ p {
                                             <label
                                                 for="penalty"
                                                 class="form-label"
+                                                step="any"
                                                 >Penalty</label
                                             >
                                             <input
@@ -438,6 +454,8 @@ p {
                                                 type="number"
                                                 class="form-control"
                                                 placeholder="0"
+                                                step="any"
+                                                v-model="getCapital"
                                             />
                                         </div>
                                     </div>
@@ -534,7 +552,7 @@ p {
                         <button
                             type="button"
                             class="btn btn-secondary"
-                            data-bs-dismiss="modal"
+                            @click="closeFormModal"
                         >
                             Cancel
                         </button>
@@ -547,7 +565,14 @@ p {
         </div>
     </div>
 
-    <div class="modal fade" ref="receiptModal" tabindex="-1" aria-hidden="true">
+    <div
+        class="modal fade"
+        ref="receiptModal"
+        tabindex="-1"
+        aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+    >
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-bottom">

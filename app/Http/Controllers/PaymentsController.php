@@ -73,6 +73,15 @@ class PaymentsController extends Controller
             'currbalance' => $balanceAfter,
         ]);
 
+        $updateSharedCapital = Borrowers::select('sharedcapital')->where('id', $request->borrower_id)->sum('sharedcapital');
+
+        $addCapital = $updateSharedCapital + $request->input('capital');
+
+        Borrowers::where('id', $request->borrower_id)
+                    ->update([
+                        'sharedcapital' => $addCapital,
+                    ]);
+
         $updateLoanSched = LoanSchedules::findorfail($request->loanSchedId);
 
         $updateLoanSched->update([

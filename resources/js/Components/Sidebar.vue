@@ -9,7 +9,8 @@ const isActive = (routeName) => {
 };
 </script>
 <style>
-img {
+.side-img,
+.side-img {
     display: block;
     max-width: 50px;
     max-height: 50px;
@@ -22,13 +23,13 @@ img {
 </style>
 <template>
     <!-- Brand -->
-    <div class="offcanvas-header">
+    <div class="offcanvas-header side-page">
         <a
             href="#"
             class="d-flex align-items-center gap-2 text-white text-decoration-none fw-semibold fs-5"
             title="FEMA"
         >
-            <img class="rounded-circle py-1" src="/img/femalogo.png" />
+            <img class="rounded-circle py-1 side-img" src="/img/femalogo.png" />
             <span class="nav-text">FEMA</span>
         </a>
         <button

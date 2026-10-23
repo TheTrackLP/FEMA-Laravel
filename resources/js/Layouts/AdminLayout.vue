@@ -8,14 +8,6 @@ import Swal from "sweetalert2";
 const sidebarOpen = ref(false); // mobile: slide-in
 const collapsed = ref(false); // desktop: icon-only
 
-function toggleSidebar() {
-    if (window.matchMedia("(min-width: 992px)").matches) {
-        collapsed.value = !collapsed.value;
-    } else {
-        sidebarOpen.value = !sidebarOpen.value;
-    }
-}
-
 // close the mobile sidebar after navigating
 const page = usePage();
 watch(
