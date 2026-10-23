@@ -6,6 +6,7 @@ use App\Models\Borrowers;
 use App\Models\Departments;
 use App\Models\Loans;
 use App\Models\LoanSchedules;
+use App\Models\LoanTypes;
 use App\Models\Payments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -122,16 +123,21 @@ class BorrowersController extends Controller
         $borrower_id = Auth::user()->borrower_id;
 
         return inertia('Borrower/Dashboard',[
+            'loanTypes' => LoanTypes::all(),
             'profileData' => Borrowers::where('id', $borrower_id)->first(),
             'borrowerLoans' => Loans::select(
                 DB::raw("SUM(loans.currbalance) as total_balance"),
-                DB::raw("COUNT(loans.currbalance) as total_loans"),
+                DB::raw("COUNT(loans.borrower_id) as total_loans"),
                 DB::raw("SUM(payments.principal) as total_principal"),
                 DB::raw("SUM(payments.interest) as total_interest"),
             )
-            ->join('payments', 'payments.loan_id', '=', 'loans.id')
-            ->where('loans.borrower_id', $borrower_id)
+            ->leftJoin('payments', 'payments.loan_id', '=', 'loans.id')
+            ->where([
+                ['loans.borrower_id', $borrower_id],
+                ['loans.status', 2]
+            ])
             ->first(),
+
             'listLoans' => Loans::select(
                 'loans.*',
                 'borrowers.fullname',
@@ -165,5 +171,57 @@ class BorrowersController extends Controller
             'schedule'=>$schedule,
             'offset'=>$offset,
         ]);
+    }
+
+    public function borrowerApplyLoanApplication(Request $request){
+        $currDate = date('Y-m-d H:i:s');
+        $valid = Validator::make($request->all(), [
+            'borrower_id' => 'required',
+            'loantype_id' => 'required',
+            'amountborrowed' => 'required',
+            'purpose' => 'required',
+        ]);
+
+        if($valid->fails()){
+            return redirect()->route('borrow.acct')->with(
+                'error', 'Error, Try Again!',
+            );
+        }
+
+        $year = now()->year;
+
+        $lastLoan = Loans::where('refno', 'like', "FEMA-LOAN-{$year}%")
+                        ->lockForUpdate()
+                        ->orderByDesc('id')
+                        ->first();
+        
+        $nextNumber = $lastLoan ? ((int) substr($lastLoan->refno, -5)) + 1 : 1;
+
+        $invoice = "FEMA-LOAN-".$year."-". str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
+        Loans::create([
+            'refno' => $invoice,
+            'borrower_id' => $request->borrower_id,
+            'loantype_id' => $request->loantype_id,
+            'amountborrowed' => $request->amountborrowed,
+            'currbalance' => $request->amountborrowed,
+            'purpose' => $request->purpose,
+            'date_applied' => $currDate,
+        ]);
+
+        return redirect()->route('borrow.acct')->with(
+            'success', 'Success, Applied for Loan!',
+        );
+    }
+     
+    public function BorrowerLogout(Request $request)
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }

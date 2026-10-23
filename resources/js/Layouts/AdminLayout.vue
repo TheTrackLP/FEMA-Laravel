@@ -1,54 +1,15 @@
 <script setup lang="ts">
 import Navbar from "@/Components/Navbar.vue";
+import Notification from "@/Components/Notification.vue";
 import Sidebar from "@/Components/Sidebar.vue";
-import { watch, ref } from "vue";
-import { usePage } from "@inertiajs/vue3";
-import Swal from "sweetalert2";
+import { ref } from "vue";
 
 const sidebarOpen = ref(false); // mobile: slide-in
 const collapsed = ref(false); // desktop: icon-only
-
-// close the mobile sidebar after navigating
-const page = usePage();
-watch(
-    () => page.url,
-    () => (sidebarOpen.value = false),
-);
-
-watch(
-    () => page.props.flash?.success,
-    (value) => {
-        if (value) {
-            Swal.fire({
-                title: "Success!",
-                text: value,
-                icon: "success",
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        }
-    },
-    { deep: true },
-);
-
-watch(
-    () => page.props.flash?.error,
-    (value) => {
-        if (value) {
-            Swal.fire({
-                title: "Error!",
-                text: value,
-                icon: "error",
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        }
-    },
-    { deep: true },
-);
 </script>
 
 <template>
+    <Notification />
     <body>
         <!-- ===================== Sidebar ===================== -->
         <aside

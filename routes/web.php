@@ -70,7 +70,9 @@ Route::middleware(['auth', 'roles:admin'])->group(function(){
 Route::middleware(['auth', 'roles:borrower'])->group(function(){
     Route::controller(BorrowersController::class)->group(function(){
         Route::get('/borrower/dashboard', 'BorrowerAccountDashboard')->name('borrow.acct');
+        Route::get('/borrower/logout', 'BorrowerLogout')->name('borrow.logout');
         Route::get('/borrower/loans/{id}/next-payment-schedule', 'NextPaymentDetails');
+        Route::post('/borrower/dashboard/apply-loan', 'borrowerApplyLoanApplication')->name('borrow.apply');
     });
 });
 

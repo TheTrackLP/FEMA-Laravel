@@ -1,6 +1,7 @@
 <script setup>
+import Notification from "@/Components/Notification.vue";
 import { currencyFormat, formatDate } from "@/reuseables";
-import { Head } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import { Modal } from "bootstrap";
 import { nextTick, onMounted, ref } from "vue";
 
@@ -11,6 +12,15 @@ const openViewModal = () => {
     nextTick(() => {
         modalInstance = new Modal(modalView.value);
         modalInstance.show();
+    });
+};
+
+const modalForm = ref(null);
+let modalInstanceForm = null;
+const openModalForm = () => {
+    nextTick(() => {
+        modalInstanceForm = new Modal(modalForm.value);
+        modalInstanceForm.show();
     });
 };
 
@@ -59,10 +69,37 @@ const getDay = (dateStr) => {
     return new Date(dateStr).getDate();
 };
 
+const applyloanForm = useForm({
+    borrower_id: "",
+    loantype_id: "",
+    amountborrowed: "",
+    purpose: "",
+});
+
+const applyForLoan = () => {
+    openModalForm();
+};
+
+const applyForLoanSubmit = () => {
+    applyloanForm.borrower_id = props.profileData.id;
+    applyloanForm.post(route("borrow.apply"), {
+        onSuccess: () => {
+            closeModal();
+            applyloanForm.reset();
+        },
+    });
+};
+
+const closeModal = () => {
+    modalInstanceForm?.hide();
+    applyloanForm.reset();
+};
+
 const props = defineProps({
     profileData: Object,
     borrowerLoans: Array,
     listLoans: Array,
+    loanTypes: Array,
 });
 </script>
 <style>
@@ -86,6 +123,7 @@ th {
 }
 </style>
 <template>
+    <Notification />
     <section>
         <Head title="Borrower" />
         <div class="container-xl py-5">
@@ -106,6 +144,25 @@ th {
                                     >Inactive</span
                                 >
                             </h4>
+                        </div>
+                        <div class="card-body">
+                            <div
+                                class="d-flex flex-row justify-content-center align-items-center gap-5"
+                            >
+                                <a
+                                    class="btn btn-outline-danger"
+                                    :href="route('borrow.logout')"
+                                >
+                                    <i class="fa-solid fa-power-off"></i> Logout
+                                </a>
+                                <button
+                                    class="btn btn-outline-primary"
+                                    @click="applyForLoan"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                    Apply
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card mb-4 mb-lg-0">
@@ -402,6 +459,7 @@ th {
                 </div>
             </div>
         </div>
+        <!-- Modal View the Loan Details -->
         <div class="modal fade" ref="modalView" tabindex="-1">
             <div
                 class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered"
@@ -549,6 +607,142 @@ th {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Apply Loan -->
+        <div
+            class="modal fade"
+            ref="modalForm"
+            tabindex="-1"
+            data-bs-keyboard="false"
+            data-bs-backdrop="static"
+        >
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <form @submit.prevent="applyForLoanSubmit">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Loan Application Form</h5>
+
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white-custom"
+                                @click="closeModal"
+                            ></button>
+                        </div>
+                        <div class="modal-body p-0">
+                            <div class="p-4 modal-body-scroll">
+                                <div class="mb-2">
+                                    <span class="section-label"
+                                        >Loan Details</span
+                                    >
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-8">
+                                        <label
+                                            for="loanPlan"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Loan Plan
+                                            <span class="required-asterisk"
+                                                >*</span
+                                            >
+                                        </label>
+                                        <v-select
+                                            :options="loanTypes"
+                                            :reduce="(type) => type.id"
+                                            label="name"
+                                            placeholder="Select Loan Type"
+                                            v-model="applyloanForm.loantype_id"
+                                        >
+                                            <template #option="type">
+                                                <span
+                                                    >{{ type.name }} [{{
+                                                        type.interest_rate
+                                                    }}% interest,
+                                                    {{ type.penalty }}%
+                                                    penalty]</span
+                                                >
+                                            </template>
+                                            <template #selected-option="type">
+                                                <span
+                                                    >{{ type.name }} [{{
+                                                        type.interest_rate
+                                                    }}% interest,
+                                                    {{ type.penalty }}%
+                                                    penalty]</span
+                                                >
+                                            </template></v-select
+                                        >
+                                        <div class="mt-1">
+                                            <small
+                                                >Plan [interest%,
+                                                Penalty%]</small
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label
+                                            for="amountBorrowed"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Amount Borrowed
+                                            <span class="required-asterisk"
+                                                >*</span
+                                            >
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"
+                                                >₱</span
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                placeholder="0.00"
+                                                min="0"
+                                                step="0.01"
+                                                required
+                                                v-model="
+                                                    applyloanForm.amountborrowed
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label
+                                        for="purpose"
+                                        class="form-label fw-semibold"
+                                        >Purpose</label
+                                    >
+                                    <textarea
+                                        class="form-control"
+                                        rows="4"
+                                        placeholder="Briefly describe the purpose of the loan"
+                                        v-model="applyloanForm.purpose"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                @click="closeModal"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="btn btn-success text-white"
+                            >
+                                Apply Loan
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
